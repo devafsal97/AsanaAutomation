@@ -1,0 +1,36 @@
+
+.escaltion-data{
+    display: flex;
+    flex-direction: row;
+    color: #64677B;
+    align-items: center;
+}
+.modal-escalation{
+    position: fixed;
+    top:10%;
+    left: 25%;
+
+    max-height: 675px;
+    background-color: #fff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+    z-index: 2;
+    display: flex;
+    flex-direction: row;
+}
+.esc-con-left{
+padding-left: 100px;
+padding-right: 100px;
+}
+.esc-con-right {
+padding-right: 100px ;
+padding-left: 50px;
+border-left: 1px solid black;
+}
+.div-h-seperator{
+    width: 2px;
+    height: 100%;
+    background-color: #64677B;
+}
+.btn-align-esc{
+        margin-left: 157px;
+}
