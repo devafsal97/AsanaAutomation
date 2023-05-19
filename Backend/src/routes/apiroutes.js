@@ -6,14 +6,11 @@ const twilio = require("twilio");
 const router = express.Router();
 
 const apiController = require("../controller/apis");
+const { tasksUrl } = require("twilio/lib/jwt/taskrouter/util");
 
 router.post("/status-callback", apiController.getCallEvents);
 
-router.post(
-  "/get-all-tasks",
-  requireAuth.requireAuth,
-  apiController.getAllTasks
-);
+router.get("/tasks", requireAuth.requireAuth, apiController.getAllTasks);
 
 router.post("/get-search-result", apiController.getSearchResult);
 

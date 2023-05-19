@@ -58,14 +58,13 @@ app.get(
     session: false,
   }),
   function (req, res) {
-    console.log(req.user);
     const token = jwt.sign(
       {
         id: req.user.id,
       },
       "mysecretkey"
     );
-    res.redirect(`http://localhost:5173/auth/success?token=${token}`);
+    res.redirect(`http://localhost:3000/auth/success?token=${token}`);
   }
 );
 app.get("/failed", (req, res) => {
@@ -73,7 +72,7 @@ app.get("/failed", (req, res) => {
 });
 
 app.get("/validateToken", requireAuth.requireAuth, (req, res) => {
-  res.json({ success: true });
+  res.json({ success: true, user: req.currentUser });
 });
 
 app.use("/webhook", webhookRoutes);

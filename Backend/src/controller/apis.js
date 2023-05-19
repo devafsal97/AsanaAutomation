@@ -11,11 +11,14 @@ exports.getCallEvents = async (req, res) => {
 };
 
 exports.getAllTasks = async (req, res) => {
-  console.log("request receieved");
-  console.log(req.body);
-  const limit = req.body.limit;
-  const offset = req.body.offset;
-  firebase.getAllTask(limit, offset).then((result) => {
+  let limit = req.query.limit;
+  let offset = req.query.offset;
+  console.log(limit, offset);
+  let keyword;
+  if ("keyword" in req.query) {
+    keyword = req.query.keyword;
+  }
+  firebase.getAllTask(limit, offset, keyword).then((result) => {
     res.json(result);
   });
 };

@@ -14,7 +14,8 @@ exports.configureGoogleStrategy = () => {
       },
       async function (request, accessToken, refreshToken, profile, done) {
         try {
-          const user = await firestore.findUserById("JvBx1TDjbvXw51QKNPL8");
+          const user = await firestore.findUserByEmail(profile._json.email);
+          console.log("user stratefgy", user);
           if (user) {
             return done(null, user);
           }

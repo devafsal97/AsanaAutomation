@@ -242,15 +242,30 @@ exports.updateAuthorCallData = async (gid, data) => {
     });
 };
 
-exports.getAllTask = async (limit, offset) => {
+exports.getAllTask = async (limit, offset, keyword) => {
+  console.log("limit", limit, "offset", offset);
   try {
-    const snapshot = await db
-      .collection("Tasks")
-      .limit(limit)
-      .offset(offset)
-      .get();
-    const tasks = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    return tasks;
+    if (!keyword) {
+      const snapshot = await db
+        .collection("Tasks")
+        .limit(parseInt(limit))
+        .offset(parseInt(offset))
+        .get();
+      const tasks = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      return tasks;
+    } else {
+      console.log(keyword);
+      const snapshot = await db
+        .collection("Tasks")
+        .where("name", ">=", keyword)
+        .where("name", "<=", keyword + "\uf8ff")
+        .get();
+      const tasks = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      return tasks;
+    }
   } catch (error) {
     console.log(error);
     return "Error retrieving tasks";
@@ -314,18 +329,54 @@ exports.updateEscalationData = async (data) => {
   }
 };
 
-exports.findUserById = async (userId) => {
+exports.findUserByEmail = async (email) => {
   try {
-    console.log("user id", userId);
+    console.log("user email", email);
+    const userDoc = await db
+      .collection("Users")
+      .where("email_id", "==", email)
+      .get();
+
+    console.log("userdoc", userDoc.docs[0].data());
+
+    if (!userDoc.empty) {
+      const user = userDoc.docs[0].data();
+      const id = userDoc.docs[0].id;
+      const userData = {
+        id: id,
+        name: user.name,
+        email: user.email_id,
+        role: user.role,
+      };
+      return userData;
+    } else {
+      console.log("User not found");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error finding user:", error);
+    throw error;
+  }
+};
+
+exports.findUserById = async (id) => {
+  try {
+    console.log("id", id);
     // Get the user document from the "Users" collection
-    const userDoc = await db.collection("Users").doc(userId).get();
+    const userDoc = await db.collection("Users").doc(id).get();
 
     // Check if the user document exists
     if (userDoc.exists) {
+      console.log(userDoc.data());
       // Access the user data
       const user = userDoc.data();
       const id = userDoc.id;
-      const userData = { id: id, name: user.name, email: user.email_id };
+      const userData = {
+        id: id,
+        name: user.name,
+        email: user.email_id,
+        role: user.role,
+      };
       return userData;
     } else {
       console.log("User not found");
