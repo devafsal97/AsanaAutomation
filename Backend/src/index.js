@@ -8,7 +8,9 @@ const jwtStategy = require("./middleware/jwt-strategy");
 const session = require("express-session");
 const jwt = require("jsonwebtoken");
 const firestore = require("./services/firestoreCrud");
-const requireAuth = require("./middleware/checkAccessToken");
+const requireAuth = require("./middleware/requireAuth");
+const roles = require("./constants/roles");
+const userRoutes = require("./routes/userRoutes");
 
 app.use(
   session({
@@ -43,6 +45,7 @@ app.use(cors());
 const webhookRoutes = require("./routes/webhookroutes");
 const apiRoutes = require("./routes/apiroutes");
 const authRoutes = require("./routes/googleauth");
+const { request } = require("express");
 
 app.get(
   "/google",
@@ -71,12 +74,13 @@ app.get("/failed", (req, res) => {
   res.send("Failed");
 });
 
-app.get("/validateToken", requireAuth.requireAuth, (req, res) => {
+app.get("/validateToken", requireAuth(roles), (req, res) => {
   res.json({ success: true, user: req.currentUser });
 });
 
 app.use("/webhook", webhookRoutes);
 app.use("/api", apiRoutes);
+app.use("/users", userRoutes);
 
 const server = app.listen(8000, () => {
   console.log("listening to port", server.address());

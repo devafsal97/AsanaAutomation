@@ -1,16 +1,17 @@
 const express = require("express");
-const requireAuth = require("../middleware/checkAccessToken");
+const roles = require("../constants/roles");
+
+const requireAuth = require("../middleware/requireAuth");
 
 const twilio = require("twilio");
 
 const router = express.Router();
 
 const apiController = require("../controller/apis");
-const { tasksUrl } = require("twilio/lib/jwt/taskrouter/util");
 
 router.post("/status-callback", apiController.getCallEvents);
 
-router.get("/tasks", requireAuth.requireAuth, apiController.getAllTasks);
+router.get("/tasks", requireAuth([roles.USER]), apiController.getAllTasks);
 
 router.post("/get-search-result", apiController.getSearchResult);
 

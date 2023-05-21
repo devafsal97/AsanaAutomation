@@ -6,7 +6,7 @@ import Homepage from "../../pages/HomePage/Homepage";
 import Dashboard from "../../Layouts/Dashboard";
 
 const AdminRoute = () => {
-  return <Dashboard />;
+  return "home";
 };
 
 export default AdminRoute;

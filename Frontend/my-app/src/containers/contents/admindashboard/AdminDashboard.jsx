@@ -1,4 +1,4 @@
-import FullWidthTabs from "../../../components/TabComponent/TabPanel";
+import FullWidthTabs from "../../../components/TabComponent/FullWidthTabs";
 import Card from "@mui/material/Card";
 
 const AdminDashboard = () => {

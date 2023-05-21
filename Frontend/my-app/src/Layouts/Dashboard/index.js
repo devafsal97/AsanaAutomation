@@ -13,6 +13,8 @@ import { Routes, Route } from "react-router-dom";
 
 import Homepage from "../../pages/HomePage/Homepage";
 import AuthorPage from "pages/AuthorPage/AuthorPage";
+import EscalationPage from "pages/EscalationPage/EscalationPage";
+import AdminPage from "pages/AdminPage/AdminPage";
 
 import List from "@mui/material/List";
 import Container from "@mui/material/Container";
@@ -21,7 +23,7 @@ import AppBar from "./AppBar";
 import Drawer from "./Drawer";
 import SearchComponent from "../../components/Search/SearchComponent";
 
-const Dashboard = () => {
+const Dashboard = ({ children }) => {
   const [open, setOpen] = useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -93,9 +95,10 @@ const Dashboard = () => {
       >
         <Toolbar />
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Routes>
-            <Route path="/" element={<AuthorPage />}></Route>
-          </Routes>
+          {children}
+          {/* <Routes>
+            <Route path="/" element={<Homepage />}></Route>
+          </Routes> */}
         </Container>
       </Box>
     </Box>

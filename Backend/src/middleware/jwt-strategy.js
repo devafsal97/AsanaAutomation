@@ -2,6 +2,7 @@ const passport = require("passport");
 const Strategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
 const firestore = require("../services/firestoreCrud");
+const User = require("../models/User");
 
 exports.configureJwtStrategy = () => {
   const opts = {};
@@ -11,7 +12,7 @@ exports.configureJwtStrategy = () => {
   passport.use(
     new Strategy(opts, async function (payload, done) {
       console.log("Jwt payload", payload);
-      const user = await firestore.findUserById(payload.id);
+      const user = await User.findById(payload.id);
       console.log("user from jwt stratagy", user);
       if (user) {
         return done(null, user);

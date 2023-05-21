@@ -4,11 +4,9 @@ import useQueryParam from "../../hooks/useQueryParam";
 import { useContext } from "react";
 import { loggedInContext } from "../../App";
 import axios from "axios";
-import { userContext } from "../../App";
 
 const Success = () => {
   const { isLoggedIn, setIsLoggedIn } = useContext(loggedInContext);
-  const { currentUser, setCurrentUser } = useContext(userContext);
   const { token } = useQueryParam("token");
   let navigate = useNavigate();
   useEffect(() => {
@@ -26,11 +24,11 @@ const Success = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log(response);
 
       if (response.data.success) {
         localStorage.setItem("token", token);
-        setIsLoggedIn(true);
-        setCurrentUser(response.data.user.role);
+        setIsLoggedIn({ isLoggedIn: true, currentUser: response.data.user });
         navigate("/");
       }
     } catch (error) {

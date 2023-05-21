@@ -1,6 +1,7 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const firestore = require("../services/firestoreCrud");
+const user = require("../models/User");
 
 exports.configureGoogleStrategy = () => {
   passport.use(
@@ -14,7 +15,7 @@ exports.configureGoogleStrategy = () => {
       },
       async function (request, accessToken, refreshToken, profile, done) {
         try {
-          const user = await firestore.findUserByEmail(profile._json.email);
+          const user = await user.findUserByEmail(profile._json.email);
           console.log("user stratefgy", user);
           if (user) {
             return done(null, user);

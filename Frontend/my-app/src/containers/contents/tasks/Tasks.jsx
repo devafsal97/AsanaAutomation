@@ -21,9 +21,7 @@ const Tasks = () => {
   };
 
   const onCloseHandler = () => {
-    console.log("close clocked");
     setCurrentPage(1);
-    console.log(currentPage);
     getTasks();
   };
 

@@ -18,6 +18,7 @@ exports.getAllTasks = async (req, res) => {
   if ("keyword" in req.query) {
     keyword = req.query.keyword;
   }
+
   firebase.getAllTask(limit, offset, keyword).then((result) => {
     res.json(result);
   });
@@ -66,5 +67,17 @@ exports.getEscalationContacts = async (req, res) => {
 exports.postEscalationContacts = async (req, res) => {
   firebase.updateEscalationData(req.body).then((result) => {
     res.json(result);
+  });
+};
+
+exports.getUsers = async (req, res) => {
+  firebase.getUsers().then((result) => {
+    return res.json(result);
+  });
+};
+
+exports.getAuthors = async (req, res) => {
+  firebase.getAuthors().then((result) => {
+    return res.json(result);
   });
 };

@@ -8,7 +8,7 @@ fs.initializeApp({
   credential: fs.credential.cert(serviceAccount),
 });
 
-const db = fs.firestore();
+exports.db = fs.firestore();
 
 exports.addTask = async (gid, name, created_at, currentAuthor, url) => {
   const task = {
@@ -195,7 +195,6 @@ exports.addComment = async (gid, comment) => {
 };
 
 exports.getTaskUrl = async (gid) => {
-  console.log("task id from getTaskUrl", gid);
   const accessToken = "1/1204569739108552:c7540c050a75c47debbebec51aaab986";
   const taskId = gid;
 
@@ -215,7 +214,6 @@ exports.getTaskUrl = async (gid) => {
 };
 
 exports.updateAuthorCallData = async (gid, data) => {
-  console.log("gid.....", gid);
   const query = db.collection("Tasks").where("gid", "==", gid);
   query
     .get()
@@ -254,7 +252,6 @@ exports.getAllTask = async (limit, offset, keyword) => {
       const tasks = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       return tasks;
     } else {
-      console.log(keyword);
       const snapshot = await db
         .collection("Tasks")
         .where("name", ">=", keyword)
@@ -281,7 +278,6 @@ exports.getSearchTask = async (searchKey) => {
       .where("name", "<=", keyword + "\uf8ff")
       .get();
     const tasks = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    console.log(tasks);
     return tasks;
   } catch (error) {
     console.log(error);
@@ -321,7 +317,6 @@ exports.updateEscalationData = async (data) => {
     }
     await docRef.update(fieldToUpdate);
     const updatedDoc = await docRef.get();
-    console.log({ id: updatedDoc.id, ...updatedDoc.data() });
     return { id: updatedDoc.id, ...updatedDoc.data() };
   } catch (error) {
     console.error("Error updating document: ", error);
@@ -331,13 +326,10 @@ exports.updateEscalationData = async (data) => {
 
 exports.findUserByEmail = async (email) => {
   try {
-    console.log("user email", email);
     const userDoc = await db
       .collection("Users")
       .where("email_id", "==", email)
       .get();
-
-    console.log("userdoc", userDoc.docs[0].data());
 
     if (!userDoc.empty) {
       const user = userDoc.docs[0].data();
@@ -359,27 +351,62 @@ exports.findUserByEmail = async (email) => {
   }
 };
 
-exports.findUserById = async (id) => {
-  try {
-    console.log("id", id);
-    // Get the user document from the "Users" collection
-    const userDoc = await db.collection("Users").doc(id).get();
+// exports.findUserById = async (id) => {
+//   try {
+//     const userDoc = await db.collection("Users").doc(id).get();
 
-    // Check if the user document exists
-    if (userDoc.exists) {
-      console.log(userDoc.data());
-      // Access the user data
-      const user = userDoc.data();
-      const id = userDoc.id;
-      const userData = {
-        id: id,
-        name: user.name,
-        email: user.email_id,
-        role: user.role,
-      };
-      return userData;
+//     if (userDoc.exists) {
+//       const user = userDoc.data();
+//       const id = userDoc.id;
+//       const userData = {
+//         id: id,
+//         name: user.name,
+//         email: user.email_id,
+//         role: user.role,
+//       };
+//       return userData;
+//     } else {
+//       console.log("User not found");
+//       return null;
+//     }
+//   } catch (error) {
+//     console.error("Error finding user:", error);
+//     throw error;
+//   }
+// };
+
+exports.getUsers = async () => {
+  try {
+    const usersDoc = await db.collection("Users").get();
+    if (!usersDoc.empty) {
+      const users = usersDoc.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      console.log("users", users);
+      return users;
     } else {
-      console.log("User not found");
+      console.log("no users in collection");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error finding user:", error);
+    throw error;
+  }
+};
+
+exports.getAuthors = async () => {
+  try {
+    const authorsDoc = await db.collection("Authors").get();
+    if (!authorsDoc.empty) {
+      const authors = authorsDoc.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      console.log("Authors", authors);
+      return authors;
+    } else {
+      console.log("no users in collection");
       return null;
     }
   } catch (error) {

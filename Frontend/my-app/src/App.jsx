@@ -10,20 +10,28 @@ import { useState } from "react";
 import * as React from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import { createContext } from "react";
+import Dashboard from "Layouts/Dashboard";
+import Homepage from "pages/HomePage/Homepage";
+import AuthorPage from "pages/AuthorPage/AuthorPage";
+import EscalationPage from "pages/EscalationPage/EscalationPage";
 export const loggedInContext = createContext();
-export const userContext = createContext();
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setIsLoggedIn] = useState({
+    isLoggedIn: false,
+    currentUser: null,
+  });
   const [isLoading, setIsLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       isTokenValid();
     } else {
-      setIsLoggedIn(false);
+      setIsLoggedIn({
+        isLoggedIn: false,
+        user: null,
+      });
       setIsLoading(false);
     }
   }, []);
@@ -35,7 +43,10 @@ function App() {
       );
 
       if (response.data.success) {
-        setIsLoggedIn(true);
+        setIsLoggedIn({
+          isLoggedIn: true,
+          currentUser: response.data.user,
+        });
       }
     } catch (error) {
       console.log("Error:", error);
@@ -50,20 +61,31 @@ function App() {
         <CircularProgress />
       </div>
     );
-  console.log("isLoggedIn", isLoggedIn);
+  console.log("isLoggedIn", user.isLoggedIn);
+
+  const withLayout = (component) => {
+    const Compenent = component;
+    return (
+      <Dashboard>
+        <Compenent />
+      </Dashboard>
+    );
+  };
   return (
-    <userContext.Provider value={{ currentUser, setCurrentUser }}>
-      <loggedInContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
-        <Routes>
-          {isLoggedIn ? (
-            <Route path="/" element={<AdminRoute />} />
-          ) : (
-            <Route path="/" element={<Login />} />
-          )}
-          <Route path="/auth/success" element={<AuthSuccess />} />
-        </Routes>
-      </loggedInContext.Provider>
-    </userContext.Provider>
+    <loggedInContext.Provider value={{ user, setIsLoggedIn }}>
+      <Routes>
+        {user.isLoggedIn ? (
+          <>
+            <Route path="/" element={withLayout(Homepage)} />
+            <Route path="/authors" element={withLayout(AuthorPage)} />
+            <Route path="/escalation" element={withLayout(EscalationPage)} />
+          </>
+        ) : (
+          <Route path="/" element={<Login />} />
+        )}
+        <Route path="/auth/success" element={<AuthSuccess />} />
+      </Routes>
+    </loggedInContext.Provider>
   );
 }
 

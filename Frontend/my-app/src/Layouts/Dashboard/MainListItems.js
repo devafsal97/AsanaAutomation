@@ -5,45 +5,26 @@ import ListItemText from "@mui/material/ListItemText";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import ContactEmergencyIcon from "@mui/icons-material/ContactEmergency";
-import TextSnippetIcon from "@mui/icons-material/TextSnippet";
 import LaptopChromebookIcon from "@mui/icons-material/LaptopChromebook";
-import { Link } from "react-router-dom";
-import { userContext } from "App";
-import { useContext } from "react";
+import { NavLink, Link } from "react-router-dom";
 
 import "./dashboard.css";
 
 const MainListItems = () => {
-  const { currentUser, setCurrentUser } = useContext(userContext);
-
   return (
-    <React.Fragment>
-      {currentUser == "admin" && (
-        <ListItemButton>
-          <ListItemIcon>
-            <DashboardIcon />
-          </ListItemIcon>
-          <Link to="/admin" className="link-style">
-            <ListItemText primary="Admin Dashboard" />
-          </Link>
-        </ListItemButton>
-      )}
-
-      <ListItemButton>
+    <div className="main-menu">
+      <ListItemButton component={NavLink} to="/">
         <ListItemIcon>
           <AssignmentIcon />
         </ListItemIcon>
-        <Link to="/" className="link-style">
-          <ListItemText primary="Tasks" />
-        </Link>
+
+        <ListItemText primary="Tasks" />
       </ListItemButton>
-      <ListItemButton>
+      <ListItemButton component={NavLink} to="/authors">
         <ListItemIcon>
           <LaptopChromebookIcon />
         </ListItemIcon>
-        <Link to="/author" className="link-style">
-          <ListItemText primary="Author" />
-        </Link>
+        <ListItemText primary="Author" />
       </ListItemButton>
       <ListItemButton>
         <ListItemIcon>
@@ -53,7 +34,15 @@ const MainListItems = () => {
           <ListItemText primary="Escalation" />
         </Link>
       </ListItemButton>
-    </React.Fragment>
+      <ListItemButton>
+        <ListItemIcon>
+          <DashboardIcon />
+        </ListItemIcon>
+        <Link to="/users" className="link-style">
+          <ListItemText primary="Users" />
+        </Link>
+      </ListItemButton>
+    </div>
   );
 };
 
