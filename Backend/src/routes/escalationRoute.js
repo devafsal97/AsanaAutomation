@@ -4,16 +4,16 @@ const roles = require("../constants/roles");
 const escalationController = require("../controller/EscalationController");
 const requireAuth = require("../middleware/requireAuth");
 
-router.get("/escalation/:id", requireAuth(roles), escalationController.getById);
+router.get("/:id", requireAuth([roles.USER]), escalationController.getById);
 
 router.get(
-  "/escalation",
-  requireAuth(roles),
+  "/",
+  requireAuth([roles.USER]),
   escalationController.getEscalationContacts
 );
 
-router.put("/escalation/:id", requireAuth(roles), escalationController.update);
+router.put("/", requireAuth([roles.USER]), escalationController.update);
 
-router.post("/escalation", requireAuth(roles), escalationController.create);
+router.post("/", requireAuth([roles.USER]), escalationController.create);
 
 module.exports = router;

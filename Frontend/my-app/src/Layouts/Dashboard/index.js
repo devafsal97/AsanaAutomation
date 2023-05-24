@@ -1,33 +1,69 @@
 import { useState } from "react";
+import { useContext } from "react";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
-import Typography from "@mui/material/Typography";
+import BadgeIcon from "@mui/icons-material/Badge";
+import EmailIcon from "@mui/icons-material/Email";
+import PhoneIcon from "@mui/icons-material/Phone";
+import LogoutIcon from "@mui/icons-material/Logout";
+import PersonIcon from "@mui/icons-material/Person";
+import { useNavigate } from "react-router-dom";
+
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
 import Divider from "@mui/material/Divider";
+
+import Typography from "@mui/material/Typography";
+
+import PersonAdd from "@mui/icons-material/PersonAdd";
+import Settings from "@mui/icons-material/Settings";
+import Logout from "@mui/icons-material/Logout";
+
 import MainListItems from "./MainListItems";
-import { Routes, Route } from "react-router-dom";
-
-import Homepage from "../../pages/HomePage/Homepage";
-import AuthorPage from "pages/AuthorPage/AuthorPage";
-import EscalationPage from "pages/EscalationPage/EscalationPage";
-import AdminPage from "pages/AdminPage/AdminPage";
-
 import List from "@mui/material/List";
 import Container from "@mui/material/Container";
 
 import AppBar from "./AppBar";
 import Drawer from "./Drawer";
-import SearchComponent from "../../components/Search/SearchComponent";
+
+import { loggedInContext } from "../../App";
 
 const Dashboard = ({ children }) => {
+  const { user, setIsLoggedIn } = useContext(loggedInContext);
+  let navigate = useNavigate();
+  {
+    console.log("context", user);
+  }
   const [open, setOpen] = useState(true);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const menuopen = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const logOutHandler = () => {
+    setIsLoggedIn({
+      isLoggedIn: false,
+      currentUser: null,
+    });
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   const toggleDrawer = () => {
     setOpen(!open);
   };
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -58,9 +94,77 @@ const Dashboard = ({ children }) => {
           >
             Dashboard
           </Typography>
-          <IconButton style={{ marginRight: "20px" }} color="inherit">
-            <AccountCircleIcon />
-          </IconButton>
+          <div>
+            <IconButton
+              style={{ marginRight: "20px" }}
+              color="inherit"
+              onClick={handleClick}
+            >
+              <AccountCircleIcon />
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              id="account-menu"
+              open={menuopen}
+              onClose={handleClose}
+              onClick={handleClose}
+              PaperProps={{
+                elevation: 0,
+                sx: {
+                  overflow: "visible",
+                  filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                  mt: 1.5,
+                  "& .MuiAvatar-root": {
+                    width: 32,
+                    height: 32,
+                    ml: -0.5,
+                    mr: 1,
+                  },
+                  "&:before": {
+                    content: '""',
+                    display: "block",
+                    position: "absolute",
+                    top: 0,
+                    right: 14,
+                    width: 10,
+                    height: 10,
+                    bgcolor: "background.paper",
+                    transform: "translateY(-50%) rotate(45deg)",
+                    zIndex: 0,
+                  },
+                },
+              }}
+              transformOrigin={{ horizontal: "right", vertical: "top" }}
+              anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+            >
+              <MenuItem>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <BadgeIcon sx={{ color: "gray", mr: 2 }} />
+                  <Typography>{user.currentUser.name}</Typography>
+                </Box>
+              </MenuItem>
+              <MenuItem>
+                <EmailIcon sx={{ color: "gray", mr: 2 }} />{" "}
+                {user.currentUser.email}
+              </MenuItem>
+              <MenuItem>
+                <PhoneIcon sx={{ color: "gray", mr: 2 }} />{" "}
+                {user.currentUser.phoneNumber}
+              </MenuItem>
+              <MenuItem>
+                <PersonIcon sx={{ color: "gray", mr: 2 }} />{" "}
+                {user.currentUser.role}
+              </MenuItem>
+              <MenuItem onClick={logOutHandler}>
+                <LogoutIcon sx={{ color: "gray", mr: 2 }} /> logout
+              </MenuItem>
+            </Menu>
+          </div>
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>

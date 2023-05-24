@@ -12,11 +12,13 @@ exports.getById = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
+  console.log(req.body);
   const response = await Escalation.update(req.body);
   res.json(response);
 };
 
 exports.getEscalationContacts = async (req, res) => {
+  console.log("escalation received");
   const response = await Escalation.getAll();
   res.json(response);
 };

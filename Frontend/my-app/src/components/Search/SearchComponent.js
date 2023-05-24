@@ -61,6 +61,13 @@ const SearchComponent = ({ onCloseHandler, onEnterHandler }) => {
     onCloseHandler();
   };
 
+  const onSearchHandler = (event) => {
+    if (event.key === "Enter") {
+      // console.log(keyword);
+      onEnterHandler(keyword);
+    }
+  };
+
   return (
     <Search>
       <SearchIconWrapper>
@@ -70,7 +77,7 @@ const SearchComponent = ({ onCloseHandler, onEnterHandler }) => {
         value={keyword}
         onChange={searchInputHandler}
         placeholder="Search…"
-        onKeyDown={(event) => onEnterHandler(event, keyword)}
+        onKeyDown={(event) => onSearchHandler(event)}
       />{" "}
       {keyword && (
         <IconButton onClick={onCloseClickHandler}>

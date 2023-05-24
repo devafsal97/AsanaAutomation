@@ -1,3 +1,5 @@
+const firestore = require("../services/firestoreCrud");
+
 class Task {
   constructor({
     name,
@@ -81,4 +83,24 @@ class Task {
       }
     }
   }
+  static async getByDate(startDate, endDate) {
+    const tasksRef = await firestore.db
+      .collection("Tasks")
+      .where("created_at", ">=", new Date(startDate))
+      .where("created_at", "<=", new Date(endDate))
+      .get();
+    console.log("hello");
+    if (!tasksRef.empty) {
+      console.log("data doc", tasksRef.docs);
+      const data = tasksRef.docs.map((doc) => {
+        console.log("data", doc.data());
+        return doc.data();
+      });
+      return data;
+    } else {
+      throw new Error("no task found for the selected dates");
+    }
+  }
 }
+
+module.exports = Task;

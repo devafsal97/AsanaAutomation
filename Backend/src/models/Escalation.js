@@ -1,3 +1,5 @@
+const firestore = require("../services/firestoreCrud");
+
 class Escalation {
   constructor({ userId, priority }) {
     this.userId = userId;
@@ -6,7 +8,9 @@ class Escalation {
 
   async save() {
     try {
-      const response = await firestore.db.collection("escalation").add(this);
+      const response = await firestore.db
+        .collection("EscalationContacts")
+        .add(this);
       return response;
     } catch (err) {
       console.log(err);
@@ -16,13 +20,15 @@ class Escalation {
   static async update(data) {
     try {
       const escalationData = await firestore.db
-        .collection("escalation")
+        .collection("EscalationContacts")
         .doc(data.id)
         .get();
       if (escalationData.exists) {
         const { id, ...dataToUpdate } = data;
-        const response = escalationData.ref.update(dataToUpdate);
-        return response;
+        const response = await escalationData.ref.update(dataToUpdate);
+        const docRef = await escalationData.ref.get();
+        const updatedDta = { id: data.id, ...docRef.data() };
+        return updatedDta;
       } else {
         return "no data found to update";
       }
@@ -33,42 +39,27 @@ class Escalation {
 
   static async findById(id) {
     const escalationDoc = await firestore.db
-      .collection("escalation")
+      .collection("EscalationContacts")
       .doc(id)
       .get();
     if (escalationDoc.exists) {
-      return authorDoc.data();
+      return escalationDoc.data();
     } else {
       return null;
     }
   }
 
-  static async getAll(offset, limit, keyword) {
+  static async getAll() {
     try {
-      if (!keyword) {
-        const snapShot = await db
-          .collection("escalation")
-          .limit(parseInt(limit))
-          .offset(parseInt(offset))
-          .get();
+      const snapShot = await firestore.db
+        .collection("EscalationContacts")
+        .get();
 
-        const escalationData = snapShot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        return escalationData;
-      } else {
-        const snapShot = await db
-          .collection("users")
-          .where("name", ">=", keyword)
-          .where("name", "<=", keyword + "\uf8ff")
-          .get();
-        const escalationData = snapShot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        return escalationData;
-      }
+      const escalationData = snapShot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      return escalationData;
     } catch (error) {
       console.log(error);
       return "Error retrieving tasks";
@@ -76,4 +67,4 @@ class Escalation {
   }
 }
 
-export default Escalation;
+module.exports = Escalation;

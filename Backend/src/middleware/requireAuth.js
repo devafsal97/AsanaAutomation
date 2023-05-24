@@ -7,15 +7,16 @@ const requireAuth = (allowedRoles) => {
       "jwt",
       { session: false },
       function (err, user, info) {
-        console.log("user from require auth ", user);
         if (err) {
           return next(err);
         }
         if (!user) {
           return res.status(401).json("unauthorized").end();
         }
+        console.log(user.role);
+        console.log(allowedRoles.includes(user.role));
 
-        if (user.role != role.ADMIN && !allowedRoles.include(user.role)) {
+        if (user.role != role.ADMIN && !allowedRoles.includes(user.role)) {
           return res.status(401).json("unauthorized").end();
         }
 

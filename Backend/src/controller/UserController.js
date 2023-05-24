@@ -19,13 +19,12 @@ exports.getById = async (req, res) => {
 
 exports.update = async (req, res) => {
   console.log("req body", req.body);
-  const response = await User.update(req.body);
-  res.json(response);
+  const user = await User.update(req.body);
+  res.json({ success: true, user });
 };
 
 exports.getUsers = async (req, res) => {
-  console.log("reached");
-  console.log(req.query.limit, req.query.offset);
-  const response = await User.getAll(req.query.limit, req.query.offset);
+  console.log("eached");
+  const response = await User.getAll();
   res.json(response);
 };

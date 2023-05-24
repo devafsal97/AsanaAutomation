@@ -11,7 +11,9 @@ const firestore = require("./services/firestoreCrud");
 const requireAuth = require("./middleware/requireAuth");
 const roles = require("./constants/roles");
 const userRoutes = require("./routes/userRoutes");
-
+const taskRoutes = require("./routes/taskRoutes");
+const authorRoutes = require("./routes/authorRoute");
+const escalationRoutes = require("./routes/escalationRoute");
 app.use(
   session({
     secret: "your-secret-key",
@@ -74,13 +76,16 @@ app.get("/failed", (req, res) => {
   res.send("Failed");
 });
 
-app.get("/validateToken", requireAuth(roles), (req, res) => {
+app.get("/validateToken", requireAuth([roles.USER]), (req, res) => {
   res.json({ success: true, user: req.currentUser });
 });
 
 app.use("/webhook", webhookRoutes);
 app.use("/api", apiRoutes);
 app.use("/users", userRoutes);
+app.use("/tasks", taskRoutes);
+app.use("/authors", authorRoutes);
+app.use("/escalation", escalationRoutes);
 
 const server = app.listen(8000, () => {
   console.log("listening to port", server.address());

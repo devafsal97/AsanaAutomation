@@ -26,21 +26,17 @@ const MainListItems = () => {
         </ListItemIcon>
         <ListItemText primary="Author" />
       </ListItemButton>
-      <ListItemButton>
+      <ListItemButton component={NavLink} to="/escalation">
         <ListItemIcon>
           <ContactEmergencyIcon />
         </ListItemIcon>
-        <Link to="/escalation" className="link-style">
-          <ListItemText primary="Escalation" />
-        </Link>
+        <ListItemText primary="Escalation" />
       </ListItemButton>
-      <ListItemButton>
+      <ListItemButton component={NavLink} to="/users">
         <ListItemIcon>
           <DashboardIcon />
         </ListItemIcon>
-        <Link to="/users" className="link-style">
-          <ListItemText primary="Users" />
-        </Link>
+        <ListItemText primary="Users" />
       </ListItemButton>
     </div>
   );

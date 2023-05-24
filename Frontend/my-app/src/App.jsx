@@ -14,6 +14,7 @@ import Dashboard from "Layouts/Dashboard";
 import Homepage from "pages/HomePage/Homepage";
 import AuthorPage from "pages/AuthorPage/AuthorPage";
 import EscalationPage from "pages/EscalationPage/EscalationPage";
+import UserPage from "pages/UserPage/UserPage";
 export const loggedInContext = createContext();
 
 function App() {
@@ -79,6 +80,7 @@ function App() {
             <Route path="/" element={withLayout(Homepage)} />
             <Route path="/authors" element={withLayout(AuthorPage)} />
             <Route path="/escalation" element={withLayout(EscalationPage)} />
+            <Route path="/users" element={withLayout(UserPage)} />
           </>
         ) : (
           <Route path="/" element={<Login />} />

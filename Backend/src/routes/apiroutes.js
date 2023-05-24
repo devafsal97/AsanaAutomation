@@ -11,8 +11,6 @@ const apiController = require("../controller/apis");
 
 router.post("/status-callback", apiController.getCallEvents);
 
-router.get("/tasks", requireAuth([roles.USER]), apiController.getAllTasks);
-
 router.post("/get-search-result", apiController.getSearchResult);
 
 router.post("/get-selected-task", apiController.getSelectedTask);

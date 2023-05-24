@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
+import Button from "@mui/material/Button";
 
 import axiosInstance from "../../../utils/axiosinstance";
 import "./Tasks.css";
@@ -7,6 +8,8 @@ import Task from "../task/Task";
 import DataTable from "../../../components/Table/DataTable";
 import IconLabelButtons from "../../../components/Button/Button";
 import SearchComponent from "components/Search/SearchComponent";
+import DateRangePicker from "components/Date/DateRangePicker";
+import Toast from "components/Toast/Toast";
 
 const Tasks = () => {
   const [tasks, setTasks] = useState([]);
@@ -14,21 +17,28 @@ const Tasks = () => {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedTask, setSelectedTask] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
-  const [taskData, setTaskData] = useState({});
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [open, setToastOpen] = useState(false);
+  const [message, setToastMessage] = useState("");
 
   const modalVisibilityHandler = () => {
     setModalVisible(false);
   };
 
   const onCloseHandler = () => {
+    setSearchKeyword("");
     setCurrentPage(1);
-    getTasks();
   };
 
-  const onEnterHandler = (event, keyword) => {
-    if (event.key === "Enter") {
-      getTasks(keyword);
-    }
+  const onEnterHandler = (keyword) => {
+    console.log("keyword1".keyword);
+    setSearchKeyword(keyword);
+    setCurrentPage(1);
+  };
+
+  const toastCloseHandler = () => {
+    setToastOpen(false);
   };
 
   const onPrevClickHandler = () => {
@@ -46,13 +56,17 @@ const Tasks = () => {
   };
 
   const getTasks = (keyword) => {
+    console.log("keyword", keyword);
     const limit = 8;
     const offset = (currentPage - 1) * limit;
 
-    let url = `http://localhost:8000/api/tasks?limit=${limit}&offset=${offset}`;
+    const url = `http://localhost:8000/tasks?limit=${limit}&offset=${offset}`;
+
     if (keyword) {
+      setCurrentPage(1);
       url = url + `&keyword=${keyword}`;
     }
+
     axiosInstance
       .get(url)
       .then((response) => {
@@ -62,56 +76,61 @@ const Tasks = () => {
       .catch((err) => {});
   };
 
+  const getTaskByDate = async () => {
+    if (startDate.length > 0 && endDate.length > 0) {
+      let url = `http://localhost:8000/tasks/getByDate?startDate=${startDate}&endDate=${endDate}`;
+      const response = await axiosInstance.get(url);
+      if (response.data.success) {
+        console.log("response", response.data.data);
+        setTasks(response.data.data);
+      } else {
+        console.log(response.data.data);
+        setToastMessage(response.data.error);
+        setToastOpen(true);
+      }
+    } else {
+      setToastMessage(" date range is not selected");
+      setToastOpen(true);
+    }
+  };
+
+  const dateChangeHandler = (date, text) => {
+    console.log(date, text);
+    if (text === "StartDate") {
+      setStartDate(date);
+    } else {
+      setEndDate(date);
+    }
+  };
+
   useEffect(() => {
     getTasks();
   }, [currentPage]);
 
   return (
     <>
+      <Toast
+        open={open}
+        closeHandler={toastCloseHandler}
+        message={message}
+        severity="error"
+      ></Toast>
       <div className="tasks-container">
         <div className="title-search">
+          <DateRangePicker text="StartDate" ondateChange={dateChangeHandler} />
+          <DateRangePicker text="EndDate" ondateChange={dateChangeHandler} />
+          <Button
+            sx={{ marginRight: "10px" }}
+            variant="contained"
+            onClick={getTaskByDate}
+          >
+            Filter
+          </Button>
           <SearchComponent
             onCloseHandler={onCloseHandler}
             onEnterHandler={onEnterHandler}
           />
         </div>
-        {/* <div className="title-search">
-          <div>
-            <input
-              placeholder="Search"
-              className="searchbox"
-              value={searchKeyword}
-              onChange={handleSearchInputChange}
-            />
-            <Link to={`/search/${searchKeyword}`}>
-              <img
-                className="search-icon"
-                src={searchIcon}
-                alt="searchtext"
-              ></img>
-            </Link>
-          </div>
-        </div> */}
-        {/* <div className="tasks-list">
-          <div className="tasks-list-head">
-            <h6 className="tasks-list-item">Id</h6>
-            <h6 className="tasks-list-item">Name</h6>
-            <h6 className="tasks-list-item">Created At</h6>
-            <h6 className="tasks-list-item">Current Author</h6>
-          </div>
-          {tasks.map((task) => (
-            <div
-              className="tasks-list-head list-item-color"
-              key={task.id}
-              onClick={() => handleTaskClick(task)}
-            >
-              <h6 className="tasks-list-item">{task.gid}</h6>
-              <h6 className="tasks-list-item"> {task.name}</h6>
-              <h6 className="tasks-list-item">{task.created_at}</h6>
-              <h6 className="tasks-list-item">{task.currentAuthor}</h6>
-            </div>
-          ))}
-        </div> */}
         <DataTable taskList={tasks} />
         <div className="button-container">
           <IconLabelButtons
@@ -125,14 +144,14 @@ const Tasks = () => {
             disabled={tasks.length < 8}
           ></IconLabelButtons>
         </div>
-        <div>
+        {/* <div>
           {modalVisible && (
             <Task
               modalVisibilityHandler={modalVisibilityHandler}
               selectedTask={selectedTask}
             ></Task>
           )}
-        </div>
+        </div> */}
       </div>
     </>
   );

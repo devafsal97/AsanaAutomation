@@ -1,24 +1,33 @@
 const firestore = require("../services/firestoreCrud");
 
 class Author {
-  constructor({ userId, time }) {
+  constructor({ userId, startTime, endTime }) {
     this.userId = userId;
-    this.time = time;
+    this.startTime = startTime;
+    this.endTime = endTime;
   }
 
   async save() {
     try {
-      const response = await firestore.db.collection("authors").add(this);
+      const response = await firestore.db
+        .collection("Authors")
+        .add({ ...this });
       return response;
     } catch (err) {
       console.log(err);
     }
   }
 
+  static async delete(id) {
+    console.log("iddddd", id);
+    const response = await firestore.db.collection("Authors").doc(id).delete();
+    return response;
+  }
+
   static async update(data) {
     try {
       const authorData = await firestore.db
-        .collection("authors")
+        .collection("Authors")
         .doc(data.id)
         .get();
       if (authorData.exists) {
@@ -34,7 +43,7 @@ class Author {
   }
 
   static async findById(id) {
-    const authorDoc = await firestore.db.collection("authors").doc(id).get();
+    const authorDoc = await firestore.db.collection("Authors").doc(id).get();
     if (authorDoc.exists) {
       return authorDoc.data();
     } else {
@@ -42,14 +51,22 @@ class Author {
     }
   }
 
-  static async getAll(offset, limit, keyword) {
+  static async findById(id) {
+    const authorDoc = await firestore.db.collection("Authors").doc(id).get();
+    if (authorDoc.exists) {
+      return authorDoc.data();
+    } else {
+      return null;
+    }
+  }
+
+  static async getAll(keyword) {
+    console.log("keyword", keyword);
     try {
       if (!keyword) {
-        const snapShot = await db
-          .collection("authors")
-          .limit(parseInt(limit))
-          .offset(parseInt(offset))
-          .get();
+        const snapShot = await firestore.db.collection("Authors").get();
+
+        console.log("doc", snapShot.docs[0]);
 
         const authorsData = snapShot.docs.map((doc) => ({
           id: doc.id,
@@ -57,8 +74,8 @@ class Author {
         }));
         return authorsData;
       } else {
-        const snapShot = await db
-          .collection("users")
+        const snapShot = await firestore.db
+          .collection("Authors")
           .where("name", ">=", keyword)
           .where("name", "<=", keyword + "\uf8ff")
           .get();
@@ -75,4 +92,4 @@ class Author {
   }
 }
 
-export default Author;
+module.exports = Author;

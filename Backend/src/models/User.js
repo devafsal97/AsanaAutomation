@@ -24,7 +24,7 @@ class User {
       if (userData.exists) {
         const { id, ...dataToUpdate } = data;
         const response = userData.ref.update(dataToUpdate);
-        return response;
+        return User.findById(data.id);
       } else {
         return "no data found to update";
       }
@@ -34,6 +34,7 @@ class User {
   }
 
   static async findById(id) {
+    console.log("id", id);
     const userDoc = await firestore.db.collection("Users").doc(id).get();
     if (userDoc.exists) {
       return { id: userDoc.id, ...userDoc.data() };
@@ -42,14 +43,10 @@ class User {
     }
   }
 
-  static async getAll(limit, offset, keyword) {
+  static async getAll(keyword) {
     try {
       if (!keyword) {
-        const snapShot = await firestore.db
-          .collection("Users")
-          .limit(parseInt(limit))
-          .offset(parseInt(offset))
-          .get();
+        const snapShot = await firestore.db.collection("Users").get();
 
         const usersData = snapShot.docs.map((doc) => ({
           id: doc.id,
@@ -76,7 +73,7 @@ class User {
   static async findUserByEmail(email) {
     const userDoc = await firestore.db
       .collection("Users")
-      .where("email_id", "==", email)
+      .where("email", "==", email)
       .get();
 
     if (!userDoc.empty) {
