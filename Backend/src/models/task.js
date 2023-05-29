@@ -68,18 +68,19 @@ class Task {
       }
     } else {
       const snapShot = await firestore.db
-        .collection("Users")
-        .where("name", ">=", keyword)
-        .where("name", "<=", keyword + "\uf8ff")
+        .collection("Tasks")
+        .where("name", "==", keyword)
+        .limit(1)
         .get();
-      if (!snapShot.isEmpty) {
-        const taskData = snapShot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        return taskData;
+      if (snapShot.docs.length != 0) {
+        console.log(snapShot.docs.length);
+        const data = snapShot.docs[0];
+        const taskData = { id: data.id, ...data.data() };
+        console.log(taskData);
+
+        return [taskData];
       } else {
-        throw new Error(`no tasks related to keyword ${keyword}`);
+        throw new Error(`no task found for the keyword ${keyword}`);
       }
     }
   }
@@ -99,6 +100,19 @@ class Task {
       return data;
     } else {
       throw new Error("no task found for the selected dates");
+    }
+  }
+
+  static async getByGid(gid) {
+    const snapShot = await firestore.db
+      .collection("Tasks")
+      .where("gid", "==", gid)
+      .get();
+
+    if (!!snapShot.docs.length) {
+      const data = snapShot.docs[0];
+      const taskData = { id: data.id, ...data.data() };
+      return taskData;
     }
   }
 }

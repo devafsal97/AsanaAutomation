@@ -10,7 +10,7 @@ import Link from "@mui/material/Link";
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 
-export default function DataTable({ taskList }) {
+export default function DataTable({ taskList, handleTaskClick }) {
   const convertTime = (time) => {
     const timestamp = new firebase.firestore.Timestamp(
       time._seconds,
@@ -28,6 +28,10 @@ export default function DataTable({ taskList }) {
       hour12: true,
     });
     return formattedDate;
+  };
+
+  const taskClickHandler = (task) => {
+    handleTaskClick(task);
   };
 
   return (
@@ -49,21 +53,33 @@ export default function DataTable({ taskList }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {console.log("tasklist", taskList)}
           {taskList.map((task) => (
             <TableRow
               key={task.id}
-              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              sx={{
+                "&:last-child td, &:last-child th": { border: 0 },
+                cursor: "pointer",
+              }}
             >
-              <TableCell>{task.name}</TableCell>
-              <TableCell align="center">
-                {convertTime(task.created_at)}
+              <TableCell onClick={() => taskClickHandler(task)}>
+                {task.name}
               </TableCell>
-              <TableCell align="center">{task.turnAroundTime}</TableCell>
-              <TableCell align="center">{task.currentAuthor}</TableCell>
+              <TableCell align="center" onClick={() => taskClickHandler(task)}>
+                {convertTime(task.createdAt)}
+              </TableCell>
+              <TableCell align="center" onClick={() => taskClickHandler(task)}>
+                {task.turnAroundTime}
+              </TableCell>
+              <TableCell align="center" onClick={() => taskClickHandler(task)}>
+                {task.author}
+              </TableCell>
               <TableCell align="center">
-                <Link sx={{ textDecoration: "none" }} href={task.taskUrl}>
-                  {task.taskUrl}
+                <Link
+                  sx={{ textDecoration: "none" }}
+                  href={task.taskUrl}
+                  target="_blank"
+                >
+                  {task.url}
                 </Link>
               </TableCell>
             </TableRow>

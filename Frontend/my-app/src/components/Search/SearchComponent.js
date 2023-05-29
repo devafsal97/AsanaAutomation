@@ -63,7 +63,7 @@ const SearchComponent = ({ onCloseHandler, onEnterHandler }) => {
 
   const onSearchHandler = (event) => {
     if (event.key === "Enter") {
-      // console.log(keyword);
+      console.log(keyword);
       onEnterHandler(keyword);
     }
   };

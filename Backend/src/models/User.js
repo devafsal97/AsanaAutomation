@@ -9,27 +9,26 @@ class User {
   }
 
   async save() {
-    console.log("raw data", { ...this });
-    const response = await firestore.db.collection("Users").add({ ...this });
-    return User.findById(response._path.segments[1]);
+    const newUser = { ...this };
+    const userByEmail = await User.findUserByEmail(newUser.email);
+    console.log(userByEmail);
+    if (userByEmail == null) {
+      const response = await firestore.db.collection("Users").add({ ...this });
+      console.log(response, "res");
+      return User.findById(response._path.segments[1]);
+    } else {
+      throw new Error("user already exist");
+    }
   }
 
   static async update(data) {
-    try {
-      const userData = await firestore.db
-        .collection("Users")
-        .doc(data.id)
-        .get();
-      console.log("userdata", userData.data());
-      if (userData.exists) {
-        const { id, ...dataToUpdate } = data;
-        const response = userData.ref.update(dataToUpdate);
-        return User.findById(data.id);
-      } else {
-        return "no data found to update";
-      }
-    } catch (err) {
-      console.log(err);
+    const userData = await firestore.db.collection("Users").doc(data.id).get();
+    if (userData.exists) {
+      const { id, ...dataToUpdate } = data;
+      await userData.ref.update(dataToUpdate);
+      return User.findById(data.id);
+    } else {
+      throw new Error("no data found to update");
     }
   }
 
@@ -76,12 +75,11 @@ class User {
       .where("email", "==", email)
       .get();
 
-    if (!userDoc.empty) {
+    if (userDoc.docs.length != 0) {
       const doc = userDoc.docs[0];
       const userData = { id: doc.id, ...doc.data() };
       return userData;
     } else {
-      console.log("User not found");
       return null;
     }
   }

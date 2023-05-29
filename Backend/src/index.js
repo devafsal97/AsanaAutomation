@@ -14,6 +14,10 @@ const userRoutes = require("./routes/userRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const authorRoutes = require("./routes/authorRoute");
 const escalationRoutes = require("./routes/escalationRoute");
+const commentsRoutes = require("./routes/commentRoutes");
+const webhookRoutes = require("./routes/webhookRoutes");
+const twilioRoutes = require("./routes/twilioRoutes");
+
 app.use(
   session({
     secret: "your-secret-key",
@@ -43,11 +47,6 @@ app.use(
 app.use(express.json());
 
 app.use(cors());
-
-const webhookRoutes = require("./routes/webhookroutes");
-const apiRoutes = require("./routes/apiroutes");
-const authRoutes = require("./routes/googleauth");
-const { request } = require("express");
 
 app.get(
   "/google",
@@ -81,11 +80,12 @@ app.get("/validateToken", requireAuth([roles.USER]), (req, res) => {
 });
 
 app.use("/webhook", webhookRoutes);
-app.use("/api", apiRoutes);
+app.use("/twilio", twilioRoutes);
 app.use("/users", userRoutes);
 app.use("/tasks", taskRoutes);
 app.use("/authors", authorRoutes);
 app.use("/escalation", escalationRoutes);
+app.use("/comments", commentsRoutes);
 
 const server = app.listen(8000, () => {
   console.log("listening to port", server.address());

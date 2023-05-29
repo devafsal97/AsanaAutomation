@@ -4,6 +4,7 @@ import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import EscalationCard from "./EscalationCard";
 import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
+import Toast from "components/Toast/Toast";
 
 import { useState, useMemo, useEffect } from "react";
 import axiosInstance from "utils/axiosinstance";
@@ -11,30 +12,41 @@ import axiosInstance from "utils/axiosinstance";
 const Escalation = () => {
   const [escalation, setEscalation] = useState([]);
   const [users, setUsers] = useState([]);
+  const [message, setMessage] = useState("");
+  const [open, setToastOpen] = useState(false);
+  const [severity, setSeverity] = useState("success");
 
   useEffect(() => {
     getUsers();
     getEscalation();
   }, []);
 
+  const toastCloseHandler = () => {
+    setToastOpen(false);
+  };
+
   const updateEscalationHandler = async (data) => {
     let url = `http://localhost:8000/escalation`;
-    try {
-      const response = await axiosInstance.put(url, data);
+    const response = await axiosInstance.put(url, data);
 
+    if (response.data.success) {
+      console.log(response.data.data);
       const newData = escalation.map((item) => {
-        if (item.id === response.data.id) {
+        if (item.id === response.data.data.id) {
           return {
-            ...response.data,
+            ...response.data.data,
           };
-          return item;
         }
         return item;
       });
-
       setEscalation(newData);
-    } catch (error) {
-      console.log("new data", error);
+      setMessage("escalation contact updated successfully");
+      setSeverity("success");
+      setToastOpen(true);
+    } else {
+      setMessage(response.data.error);
+      setSeverity("error");
+      setToastOpen(true);
     }
   };
 
@@ -66,6 +78,12 @@ const Escalation = () => {
 
   return (
     <>
+      <Toast
+        open={open}
+        message={message}
+        severity={severity}
+        closeHandler={toastCloseHandler}
+      ></Toast>
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         {!!escalation.length &&
           !!users.length &&

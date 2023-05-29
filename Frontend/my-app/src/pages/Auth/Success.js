@@ -4,9 +4,10 @@ import useQueryParam from "../../hooks/useQueryParam";
 import { useContext } from "react";
 import { loggedInContext } from "../../App";
 import axios from "axios";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const Success = () => {
-  const { isLoggedIn, setIsLoggedIn } = useContext(loggedInContext);
+  const { auth, setIsLoggedIn } = useContext(loggedInContext);
   const { token } = useQueryParam("token");
   let navigate = useNavigate();
   useEffect(() => {
@@ -36,7 +37,7 @@ const Success = () => {
     }
   };
 
-  return "loading";
+  return <CircularProgress />;
 };
 
 export default Success;

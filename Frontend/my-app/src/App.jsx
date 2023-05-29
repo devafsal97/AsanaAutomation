@@ -2,7 +2,6 @@ import "./App.css";
 import { Routes } from "react-router-dom";
 import { Route } from "react-router-dom";
 import Login from "./pages/LoginPage/Login";
-import AdminRoute from "./routes/adminroute/AdminRoute";
 import AuthSuccess from "./pages/Auth/Success";
 import { useEffect } from "react";
 import axiosInstance from "./utils/axiosinstance";
@@ -18,7 +17,7 @@ import UserPage from "pages/UserPage/UserPage";
 export const loggedInContext = createContext();
 
 function App() {
-  const [user, setIsLoggedIn] = useState({
+  const [auth, setIsLoggedIn] = useState({
     isLoggedIn: false,
     currentUser: null,
   });
@@ -31,7 +30,7 @@ function App() {
     } else {
       setIsLoggedIn({
         isLoggedIn: false,
-        user: null,
+        auth: null,
       });
       setIsLoading(false);
     }
@@ -62,7 +61,7 @@ function App() {
         <CircularProgress />
       </div>
     );
-  console.log("isLoggedIn", user.isLoggedIn);
+  console.log("isLoggedIn", auth.isLoggedIn);
 
   const withLayout = (component) => {
     const Compenent = component;
@@ -73,9 +72,9 @@ function App() {
     );
   };
   return (
-    <loggedInContext.Provider value={{ user, setIsLoggedIn }}>
+    <loggedInContext.Provider value={{ auth, setIsLoggedIn }}>
       <Routes>
-        {user.isLoggedIn ? (
+        {auth.isLoggedIn ? (
           <>
             <Route path="/" element={withLayout(Homepage)} />
             <Route path="/authors" element={withLayout(AuthorPage)} />

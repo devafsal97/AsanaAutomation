@@ -1,7 +1,7 @@
 import Drawer from "components/Drawer";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import Button from "@mui/material/Button";
-
+import { format } from "date-fns";
 import * as Yup from "yup";
 import TextField from "@mui/material/TextField";
 
@@ -12,9 +12,10 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
+
 import Authors from "./Authors";
 import { useEffect, useState } from "react";
 import axiosInstance from "utils/axiosinstance";
@@ -29,6 +30,19 @@ const AuthorForm = ({ isOpen, toggleDrawer, addAuthorHandler }) => {
     userId: "",
     startTime: "",
     endTime: "",
+  };
+
+  const onDateChangeHandler = (date, formik, key) => {
+    const time = new Date(date.$d).toLocaleString("en-US", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    });
+    if (key == "startTime") {
+      formik.setFieldValue("startTime", time);
+    } else {
+      formik.setFieldValue("endTime", time);
+    }
   };
 
   const getUsers = async () => {
@@ -112,7 +126,7 @@ const AuthorForm = ({ isOpen, toggleDrawer, addAuthorHandler }) => {
                   label="start time"
                   value={formik.values.startTime}
                   onChange={(value) => {
-                    formik.setFieldValue("startTime", value.$d);
+                    onDateChangeHandler(value, formik, "startTime");
                   }}
                   error={
                     formik.touched.startTime && Boolean(formik.errors.startTime)
@@ -150,9 +164,9 @@ const AuthorForm = ({ isOpen, toggleDrawer, addAuthorHandler }) => {
                 <TimePicker
                   label="end time"
                   value={formik.values.endTime}
-                  onChange={(value) => {
-                    formik.setFieldValue("endTime", value.$d);
-                  }}
+                  onChange={(value) =>
+                    onDateChangeHandler(value, formik, "endTime")
+                  }
                   error={
                     formik.touched.endTime && Boolean(formik.errors.endTime)
                   }

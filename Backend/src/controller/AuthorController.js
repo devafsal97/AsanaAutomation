@@ -7,7 +7,7 @@ exports.create = async (req, res) => {
     const response = await author.save();
     res.json({ success: true, data: response });
   } catch (error) {
-    res.json({ success: false, data: error.message });
+    res.json({ success: false, error: error.message });
   }
 };
 

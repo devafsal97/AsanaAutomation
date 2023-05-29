@@ -36,10 +36,10 @@ import Drawer from "./Drawer";
 import { loggedInContext } from "../../App";
 
 const Dashboard = ({ children }) => {
-  const { user, setIsLoggedIn } = useContext(loggedInContext);
+  const { auth, setIsLoggedIn } = useContext(loggedInContext);
   let navigate = useNavigate();
   {
-    console.log("context", user);
+    console.log("context", auth);
   }
   const [open, setOpen] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -145,20 +145,20 @@ const Dashboard = ({ children }) => {
                   }}
                 >
                   <BadgeIcon sx={{ color: "gray", mr: 2 }} />
-                  <Typography>{user.currentUser.name}</Typography>
+                  <Typography>{auth.currentUser.name}</Typography>
                 </Box>
               </MenuItem>
               <MenuItem>
                 <EmailIcon sx={{ color: "gray", mr: 2 }} />{" "}
-                {user.currentUser.email}
+                {auth.currentUser.email}
               </MenuItem>
               <MenuItem>
                 <PhoneIcon sx={{ color: "gray", mr: 2 }} />{" "}
-                {user.currentUser.phoneNumber}
+                {auth.currentUser.phoneNumber}
               </MenuItem>
               <MenuItem>
                 <PersonIcon sx={{ color: "gray", mr: 2 }} />{" "}
-                {user.currentUser.role}
+                {auth.currentUser.role}
               </MenuItem>
               <MenuItem onClick={logOutHandler}>
                 <LogoutIcon sx={{ color: "gray", mr: 2 }} /> logout
@@ -172,11 +172,24 @@ const Dashboard = ({ children }) => {
           sx={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "flex-end",
+            justifyContent: "center",
             px: [1],
           }}
         >
-          <IconButton onClick={toggleDrawer}>
+          {open && (
+            <Typography
+              sx={{
+                marginLeft: "auto",
+                color: "#2076D2",
+                fontWeight: "Bold",
+                letterSpacing: "4px",
+              }}
+              variant="h5"
+            >
+              AUKI
+            </Typography>
+          )}
+          <IconButton sx={{ marginLeft: "auto" }} onClick={toggleDrawer}>
             <ChevronLeftIcon />
           </IconButton>
         </Toolbar>

@@ -12,9 +12,13 @@ exports.getById = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
-  console.log(req.body);
-  const response = await Escalation.update(req.body);
-  res.json(response);
+  try {
+    console.log(req.body);
+    const response = await Escalation.update(req.body);
+    res.json({ success: true, data: response });
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
 };
 
 exports.getEscalationContacts = async (req, res) => {

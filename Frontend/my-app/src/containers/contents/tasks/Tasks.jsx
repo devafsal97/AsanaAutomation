@@ -10,6 +10,7 @@ import IconLabelButtons from "../../../components/Button/Button";
 import SearchComponent from "components/Search/SearchComponent";
 import DateRangePicker from "components/Date/DateRangePicker";
 import Toast from "components/Toast/Toast";
+import Comments from "./Comments";
 
 const Tasks = () => {
   const [tasks, setTasks] = useState([]);
@@ -21,9 +22,15 @@ const Tasks = () => {
   const [endDate, setEndDate] = useState("");
   const [open, setToastOpen] = useState(false);
   const [message, setToastMessage] = useState("");
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [severity, setToastSeverity] = useState("success");
 
-  const modalVisibilityHandler = () => {
-    setModalVisible(false);
+  const toggleDrawer = () => {
+    setDrawerOpen(!drawerOpen);
+  };
+  const toggleComments = () => {
+    setCommentsOpen(!commentsOpen);
   };
 
   const onCloseHandler = () => {
@@ -32,9 +39,13 @@ const Tasks = () => {
   };
 
   const onEnterHandler = (keyword) => {
-    console.log("keyword1".keyword);
+    console.log("from parent", keyword);
     setSearchKeyword(keyword);
-    setCurrentPage(1);
+    if (currentPage != 1) {
+      setCurrentPage(1);
+    } else {
+      getTasks();
+    }
   };
 
   const toastCloseHandler = () => {
@@ -51,29 +62,30 @@ const Tasks = () => {
 
   const handleTaskClick = (task) => {
     setSelectedTask(task);
-    setModalVisible(true);
-    console.log("selected task", selectedTask);
+    setDrawerOpen(true);
   };
 
-  const getTasks = (keyword) => {
-    console.log("keyword", keyword);
+  const getTasks = async () => {
+    console.log(searchKeyword);
     const limit = 8;
     const offset = (currentPage - 1) * limit;
 
-    const url = `http://localhost:8000/tasks?limit=${limit}&offset=${offset}`;
+    let url = `http://localhost:8000/tasks?limit=${limit}&offset=${offset}`;
 
-    if (keyword) {
-      setCurrentPage(1);
-      url = url + `&keyword=${keyword}`;
+    if (searchKeyword) {
+      url = url.concat(`&keyword=${searchKeyword}`);
     }
 
-    axiosInstance
-      .get(url)
-      .then((response) => {
-        setTasks(response.data);
-        console.log(response.data);
-      })
-      .catch((err) => {});
+    console.log("url", url);
+
+    const response = await axiosInstance.get(url);
+    if (response.data.success) {
+      setTasks(response.data.data);
+    } else {
+      setToastSeverity("error");
+      setToastMessage(response.data.error);
+      setToastOpen(true);
+    }
   };
 
   const getTaskByDate = async () => {
@@ -81,21 +93,25 @@ const Tasks = () => {
       let url = `http://localhost:8000/tasks/getByDate?startDate=${startDate}&endDate=${endDate}`;
       const response = await axiosInstance.get(url);
       if (response.data.success) {
-        console.log("response", response.data.data);
         setTasks(response.data.data);
       } else {
-        console.log(response.data.data);
         setToastMessage(response.data.error);
         setToastOpen(true);
       }
     } else {
-      setToastMessage(" date range is not selected");
+      setToastMessage("please select the date range");
+      setToastSeverity("error");
       setToastOpen(true);
     }
   };
 
+  const commentToastHandler = () => {
+    setToastMessage("comment updated successfully");
+    setToastSeverity("success");
+    setToastOpen(true);
+  };
+
   const dateChangeHandler = (date, text) => {
-    console.log(date, text);
     if (text === "StartDate") {
       setStartDate(date);
     } else {
@@ -109,14 +125,35 @@ const Tasks = () => {
 
   return (
     <>
+      <Comments
+        open={commentsOpen}
+        closeDrawer={toggleComments}
+        commentToastHandler={commentToastHandler}
+      ></Comments>
+
+      {drawerOpen && (
+        <Task
+          open={drawerOpen}
+          closeDrawer={toggleDrawer}
+          selectedTask={selectedTask}
+        ></Task>
+      )}
+
       <Toast
         open={open}
         closeHandler={toastCloseHandler}
         message={message}
-        severity="error"
+        severity={severity}
       ></Toast>
       <div className="tasks-container">
         <div className="title-search">
+          <Button
+            sx={{ marginRight: "10px" }}
+            variant="contained"
+            onClick={toggleComments}
+          >
+            Comments
+          </Button>
           <DateRangePicker text="StartDate" ondateChange={dateChangeHandler} />
           <DateRangePicker text="EndDate" ondateChange={dateChangeHandler} />
           <Button
@@ -131,7 +168,7 @@ const Tasks = () => {
             onEnterHandler={onEnterHandler}
           />
         </div>
-        <DataTable taskList={tasks} />
+        <DataTable taskList={tasks} handleTaskClick={handleTaskClick} />
         <div className="button-container">
           <IconLabelButtons
             text="Previous Page"
@@ -144,14 +181,6 @@ const Tasks = () => {
             disabled={tasks.length < 8}
           ></IconLabelButtons>
         </div>
-        {/* <div>
-          {modalVisible && (
-            <Task
-              modalVisibilityHandler={modalVisibilityHandler}
-              selectedTask={selectedTask}
-            ></Task>
-          )}
-        </div> */}
       </div>
     </>
   );

@@ -37,7 +37,7 @@ const EscalationCard = ({
     phoneNumber: "",
   };
 
-  const { user, setIsLoggedIn } = useContext(loggedInContext);
+  const { auth, setIsLoggedIn } = useContext(loggedInContext);
 
   const editHandler = () => {
     setEditMode(true);
@@ -73,7 +73,7 @@ const EscalationCard = ({
           minHeight: "342px",
         }}
       >
-        {edit === true && user.currentUser.role === "admin" && (
+        {edit === true && auth.currentUser.role === "admin" && (
           <IconButton
             sx={{ position: "absolute", right: "10px", color: "gray" }}
             onClick={closeHandler}
@@ -82,7 +82,7 @@ const EscalationCard = ({
           </IconButton>
         )}
 
-        {edit === false && user.currentUser.role === "admin" && (
+        {edit === false && auth.currentUser.role === "admin" && (
           <IconButton
             sx={{ position: "absolute", right: "10px", color: "gray" }}
             onClick={editHandler}

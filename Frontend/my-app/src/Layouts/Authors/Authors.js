@@ -11,27 +11,27 @@ import Toast from "components/Toast/Toast";
 import { loggedInContext } from "App";
 
 const Authors = () => {
-  const { user, setIsLoggedIn } = useContext(loggedInContext);
+  const { auth, setIsLoggedIn } = useContext(loggedInContext);
   const [author, setAuthor] = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [authors, setAuthors] = useState([]);
   const [open, setToastOpen] = useState(false);
   const [message, setToastMessage] = useState("");
   const [buttonVisibilty, setButtonVisibilty] = useState(false);
+  const [severity, setSeverity] = useState("success");
+  const [users, setUsers] = useState([]);
 
-  const onClickEditAuthor = (author) => {
-    setAuthor(author);
-    toggleDrawer();
-  };
+  useEffect(() => {
+    getUsers();
+    getAuthors();
+  }, []);
 
-  const setAuthorsHandler = (authors) => {
-    {
-      console.log("lengty", authors.length);
-    }
-    setAuthors(authors);
-    if (authors.length < 2) {
-      setButtonVisibilty(true);
-    }
+  const onClickDeleteHandler = (id) => {
+    const updatedArray = authors.filter((item) => item.id !== id);
+    setAuthors(updatedArray);
+    setToastMessage("author deleted successfully");
+    setSeverity("error");
+    setToastOpen(true);
   };
 
   const toggleDrawer = () => {
@@ -43,6 +43,27 @@ const Authors = () => {
     setToastOpen(false);
   };
 
+  const getAuthors = async () => {
+    let url = `http://localhost:8000/authors`;
+    try {
+      const response = await axiosInstance.get(url);
+      console.log(response.data);
+      setAuthors(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getUsers = async () => {
+    let url = `http://localhost:8000/users`;
+    try {
+      const response = await axiosInstance.get(url);
+      setUsers(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const addAuthorHandler = async (data) => {
     console.log("data", data);
     const response = await axiosInstance.post(
@@ -50,10 +71,16 @@ const Authors = () => {
       data
     );
     if (response.data.success) {
+      setDrawerOpen(false);
       setToastMessage("author added successfully");
+      setSeverity("success");
+      setToastOpen(true);
+      setAuthors((previous) => [...authors, response.data.data]);
+    } else {
+      setToastMessage(response.data.error);
+      setSeverity("error");
       setToastOpen(true);
     }
-    console.log("response", response);
   };
 
   return (
@@ -62,6 +89,7 @@ const Authors = () => {
         open={open}
         closeHandler={toastCloseHandler}
         message={message}
+        severity={severity}
       ></Toast>
       <AuthorForm
         isOpen={drawerOpen}
@@ -69,7 +97,7 @@ const Authors = () => {
         addAuthorHandler={addAuthorHandler}
       />
 
-      {buttonVisibilty && user.currentUser.role === "admin" && (
+      {authors.length < 2 && auth.currentUser.role === "admin" && (
         <Box
           sx={{ display: "flex", justifyContent: "end", marginBottom: "10px" }}
         >
@@ -84,8 +112,9 @@ const Authors = () => {
       )}
 
       <AuthorTable
-        onClickEditHandler={onClickEditAuthor}
-        setAuthorsHandler={setAuthorsHandler}
+        onClickDeleteHandler={onClickDeleteHandler}
+        authors={authors}
+        users={users}
       />
     </>
   );

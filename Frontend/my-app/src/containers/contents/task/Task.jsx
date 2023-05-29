@@ -1,97 +1,215 @@
-// import "./Task.css";
-// import closeIcon from "../../../assets/cancel.png";
+import Drawer from "components/Drawer";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import firebase from "firebase/compat/app";
+import "firebase/compat/firestore";
+import Divider from "@mui/material/Divider";
+import Link from "@mui/material/Link";
 
-// const Task = ({ modalVisibilityHandler, selectedTask }) => {
-//   const ecalationCall = ["FirstCall", "SecondCall", "ThirdCall"];
-//   return (
-//     <div className="modal">
-//       <img
-//         className="close-icon"
-//         src={closeIcon}
-//         alt="close icon"
-//         onClick={modalVisibilityHandler}
-//       ></img>
-//       <div className="modal-seca">
-//         <div className="modal-item-seca">
-//           <h3 className="modal-h3">Id:</h3>
-//           <h3 className="item-value"> {selectedTask.id}</h3>
-//         </div>
-//         <div className="modal-item-seca">
-//           <h3 className="modal-h3">Name:</h3>
-//           <h3 className="item-value"> {selectedTask.name}</h3>
-//         </div>
-//         <div className="modal-item-seca">
-//           <h3 className="modal-h3">Created at:</h3>
-//           <h3 className="item-value"> {selectedTask.created_at}</h3>
-//         </div>
-//         <div className="modal-item-seca">
-//           <h3 className="modal-h3">Current author:</h3>
-//           <h3 className="item-value"> {selectedTask.currentAuthor}</h3>
-//         </div>
-//         <div className="modal-item-seca">
-//           <h3 className="modal-h3">Gid:</h3>
-//           <h3 className="item-value"> {selectedTask.gid}</h3>
-//         </div>
-//       </div>
-//       <div className="modal-secb">
-//         <div className="modal-item sec-b-h4">
-//           <h4 className="secb-title">CurrentAuthor Call Status:</h4>
-//           <div className="secb-item-value">
-//             <div className="modal-secb-item">
-//               <h4 className="h4-width">number:</h4>
-//               <h4>{selectedTask.currentAuthotCallStatus.number}</h4>
-//             </div>
-//             <div className="modal-secb-item">
-//               <h4 className="h4-width">call status:</h4>
-//               <h4>{selectedTask.currentAuthotCallStatus.callStatus}</h4>
-//             </div>
-//             <div className="modal-secb-item">
-//               <h4 className="h4-width">called time:</h4>
-//               <h4>{selectedTask.currentAuthotCallStatus.timeStamp}</h4>
-//             </div>
-//           </div>
-//         </div>
-//         <div className="modal-item sec-b-h4">
-//           <h4 className="secb-title">Task Inprogress Time:</h4>
-//           <h4 className="secb-item-value">{selectedTask.inProgressTime}</h4>
-//         </div>
-//         <div className="modal-item sec-b-h4">
-//           <h4 className="secb-title">Task Completed Time:</h4>
-//           <h4 className="secb-item-value">{selectedTask.taskCompletedTime}</h4>
-//         </div>
-//         <div className="modal-item sec-b-h4">
-//           <h4 className="secb-title">Turnaround Time:</h4>
-//           <h4 className="secb-item-value">{selectedTask.turnAroundTime}</h4>
-//         </div>
-//         <div className="modal-item sec-b-h4">
-//           <h4 className="secb-title">Task Url:</h4>
-//           <h4 className="secb-item-value">{selectedTask.taskUrl}</h4>
-//         </div>
-//         <div className="modal-item sec-b-h4">
-//           <h4 className="secb-title">Escalation Process:</h4>
-//           <div className="secb-item-value">
-//             {selectedTask.escalationProcess.map((item, index) => (
-//               <div className="escalation-call">
-//                 <div className="sec-b-h4">{ecalationCall[index]}</div>
-//                 <div className="modal-secb-item">
-//                   <h4 className="h4-width">number:</h4>
-//                   <h4>{item.number}</h4>
-//                 </div>
-//                 <div className="modal-secb-item">
-//                   <h4 className="h4-width">call status:</h4>
-//                   <h4>{item.callStatus}</h4>
-//                 </div>
-//                 <div className="modal-secb-item">
-//                   <h4 className="h4-width">called time:</h4>
-//                   <h4>{item.timeStamp}</h4>
-//                 </div>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
+const Task = ({ open, closeDrawer, selectedTask }) => {
+  console.log("selected tas", selectedTask);
 
-// export default Task;
+  const convertTime = (time) => {
+    console.log("time", time);
+    const timestamp = new firebase.firestore.Timestamp(
+      time._seconds,
+      time._nanoseconds
+    );
+    timestamp.toDate();
+    const date = new Date(timestamp.toDate());
+    const formattedDate = date.toLocaleString("en-US", {
+      month: "numeric",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hour12: true,
+    });
+    return formattedDate;
+  };
+
+  const callPriority = [
+    "Initial Call Status:",
+    "Secondary Call Status:",
+    "Tertiary call Status:",
+  ];
+
+  const boxStyle = {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "baseline",
+    marginBottom: "3px",
+  };
+  const titleStye = { width: "150px", fontWeight: "600" };
+
+  return (
+    <Drawer isOpen={open} onClose={closeDrawer} title="Task">
+      {console.log("stask".selectedTask)}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          position: "relative",
+        }}
+      >
+        <Box sx={boxStyle}>
+          <Typography variant="subtitle1" sx={titleStye}>
+            Name:
+          </Typography>
+          <Typography variant="subtitle1">{selectedTask.name}</Typography>
+        </Box>
+        <Divider />
+        <Box sx={boxStyle}>
+          <Typography variant="subtitle1" sx={titleStye}>
+            Gid:
+          </Typography>
+          <Typography variant="subtitle1">{selectedTask.gid}</Typography>
+        </Box>
+        <Divider />
+        <Box sx={boxStyle}>
+          <Typography variant="subtitle1" sx={titleStye}>
+            Created At:
+          </Typography>
+          <Typography variant="subtitle1">
+            {convertTime(selectedTask.createdAt)}
+          </Typography>
+        </Box>
+        <Divider />
+        <Box sx={boxStyle}>
+          <Typography variant="subtitle1" sx={titleStye}>
+            Author:
+          </Typography>
+          <Typography variant="subtitle1">{selectedTask.author}</Typography>
+        </Box>
+        <Divider />
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          <Typography variant="subtitle1" sx={titleStye}>
+            Author Call Status:
+          </Typography>
+          <Box sx={{ marginLeft: "150px" }}>
+            <Box sx={boxStyle}>
+              <Typography sx={{ marginRight: "15px" }} variant="subtitle1">
+                Call Status:
+              </Typography>
+              <Typography>
+                {selectedTask.currentAuthotCallStatus.callStatus}
+              </Typography>
+            </Box>
+            <Box sx={boxStyle}>
+              <Typography sx={{ marginRight: "15px" }} variant="subtitle1">
+                Time:
+              </Typography>
+              <Typography>
+                {selectedTask.currentAuthotCallStatus.timeStamp}
+              </Typography>
+            </Box>
+            <Box sx={boxStyle}>
+              <Typography sx={{ marginRight: "15px" }} variant="subtitle1">
+                number
+              </Typography>
+              <Typography>
+                {selectedTask.currentAuthotCallStatus.number}
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+        <Divider />
+        <Box sx={boxStyle}>
+          <Typography variant="subtitle1" sx={titleStye}>
+            Inprogress Time:
+          </Typography>
+          <Typography variant="subtitle1">
+            {selectedTask.inProgressTime}
+          </Typography>
+        </Box>
+        <Divider />
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          <Typography variant="subtitle1" sx={titleStye}>
+            Escalation Process:
+          </Typography>
+          <Box sx={{ marginLeft: "150px" }}>
+            {selectedTask.escalationProcess.map((item, index) => {
+              return (
+                <Box
+                  sx={{
+                    marginBottom: "10px",
+                    borderBottom: "1px solid #E0E0E0",
+                  }}
+                >
+                  <Box sx={boxStyle}>
+                    <Typography
+                      sx={{ marginRight: "15px" }}
+                      variant="subtitle1"
+                    >
+                      {callPriority[index]}
+                    </Typography>
+                    <Typography>{item.callStatus}</Typography>
+                  </Box>
+                  <Box sx={boxStyle}>
+                    <Typography
+                      sx={{ marginRight: "15px" }}
+                      variant="subtitle1"
+                    >
+                      Time:
+                    </Typography>
+                    <Typography>{item.timeStamp}</Typography>
+                  </Box>
+                  <Box sx={boxStyle}>
+                    <Typography
+                      sx={{ marginRight: "15px" }}
+                      variant="subtitle1"
+                    >
+                      number
+                    </Typography>
+                    <Typography>{item.number}</Typography>
+                  </Box>
+                </Box>
+              );
+            })}
+          </Box>
+        </Box>
+        <Divider />
+        <Box sx={boxStyle}>
+          <Typography variant="subtitle1" sx={titleStye}>
+            Completed Time:
+          </Typography>
+          <Typography variant="subtitle1">
+            {selectedTask.completedTime}
+          </Typography>
+        </Box>
+        <Divider />
+        <Box sx={boxStyle}>
+          <Typography variant="subtitle1" sx={titleStye}>
+            Turn Arround Time:
+          </Typography>
+          <Typography variant="subtitle1">
+            {selectedTask.turnArroundTime}
+          </Typography>
+        </Box>
+        <Divider />
+        <Box sx={boxStyle}>
+          <Typography
+            variant="subtitle1"
+            sx={{ ...titleStye, marginRight: "10px" }}
+          >
+            Url:
+          </Typography>
+          <Typography variant="subtitle1">
+            <Link
+              sx={{ textDecoration: "none" }}
+              href={selectedTask.url}
+              target="_blank"
+            >
+              {selectedTask.url}
+            </Link>
+          </Typography>
+        </Box>
+        <Divider />
+      </Box>
+    </Drawer>
+  );
+};
+
+export default Task;

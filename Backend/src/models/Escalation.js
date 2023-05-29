@@ -18,7 +18,9 @@ class Escalation {
   }
 
   static async update(data) {
-    try {
+    const escalationById = await Escalation.findByUserId(data.userId);
+    console.log(escalationById, "esca");
+    if (escalationById == null) {
       const escalationData = await firestore.db
         .collection("EscalationContacts")
         .doc(data.id)
@@ -28,12 +30,9 @@ class Escalation {
         const response = await escalationData.ref.update(dataToUpdate);
         const docRef = await escalationData.ref.get();
         const updatedDta = { id: data.id, ...docRef.data() };
+        console.log(updatedDta);
         return updatedDta;
-      } else {
-        return "no data found to update";
       }
-    } catch (err) {
-      console.log(err);
     }
   }
 
@@ -43,6 +42,7 @@ class Escalation {
       .doc(id)
       .get();
     if (escalationDoc.exists) {
+      console.log("dataaa", escalationDoc.data());
       return escalationDoc.data();
     } else {
       return null;
@@ -63,6 +63,19 @@ class Escalation {
     } catch (error) {
       console.log(error);
       return "Error retrieving tasks";
+    }
+  }
+
+  static async findByUserId(userId) {
+    console.log(userId, "fsfgsfbs");
+    const escalationDoc = await firestore.db
+      .collection("EscalationContacts")
+      .where("userId", "==", userId)
+      .get();
+    if (escalationDoc.docs.length == 0) {
+      return null;
+    } else {
+      throw new Error("escalation contact already exist");
     }
   }
 }

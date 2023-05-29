@@ -24,10 +24,17 @@ exports.update = async (req, res) => {
 };
 
 exports.getTasks = async (req, res) => {
-  console.log("reached");
-  console.log(req.query.limit, req.query.offset);
-  const response = await Task.getAll(req.query.limit, req.query.offset);
-  res.json(response);
+  try {
+    console.log("reached");
+    const keyword = req.query.keyword;
+    const limit = req.query.limit;
+    const offset = req.query.offset;
+    console.log(req.query.limit, req.query.offset);
+    const response = await Task.getAll(limit, offset, keyword);
+    res.json({ success: true, data: response });
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
 };
 
 exports.getByDate = async (req, res) => {

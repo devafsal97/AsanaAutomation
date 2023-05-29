@@ -13,49 +13,19 @@ import IconButton from "@mui/material/IconButton";
 import { useMemo } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-export default function AuthorTable({
-  onClickDeleteHandler,
-  setAuthorsHandler,
-}) {
-  const [authors, setAuthors] = useState([]);
-  const [users, setUsers] = useState([]);
-  const { user, setIsLoggedIn } = useContext(loggedInContext);
+export default function AuthorTable({ onClickDeleteHandler, authors, users }) {
+  const { auth, setIsLoggedIn } = useContext(loggedInContext);
   const [currentPage, setCurrentPage] = useState(1);
-
-  useEffect(() => {
-    getUsers();
-    getAuthors();
-  }, []);
 
   const deleteAuthor = async (id) => {
     console.log(id);
     let url = `http://localhost:8000/authors/${id}`;
     const response = await axiosInstance.delete(url);
-  };
-
-  const getAuthors = async () => {
-    const limit = 8;
-    const offset = (currentPage - 1) * limit;
-
-    let url = `http://localhost:8000/authors`;
-    try {
-      const response = await axiosInstance.get(url);
-      setAuthors(response.data);
-      setAuthorsHandler(response.data);
-    } catch (error) {
-      console.log(error);
+    if (response.data.success) {
+      onClickDeleteHandler(id);
     }
   };
 
-  const getUsers = async () => {
-    let url = `http://localhost:8000/users`;
-    try {
-      const response = await axiosInstance.get(url);
-      setUsers(response.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
   const usersById = useMemo(() => {
     return users.reduce((byId, user) => {
       byId[user.id] = user;
@@ -68,18 +38,12 @@ export default function AuthorTable({
       <Table aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell width="18%">Name</TableCell>
-            <TableCell width="18%" align="center">
-              Start Time
-            </TableCell>
-            <TableCell width="18%" align="center">
-              End Time
-            </TableCell>
-            <TableCell width="18%" align="center">
-              Email
-            </TableCell>
+            <TableCell>Name</TableCell>
+            <TableCell align="center">Start Time</TableCell>
+            <TableCell align="center">End Time</TableCell>
+            <TableCell align="center">Email</TableCell>
             <TableCell align="center">PhoneNumber</TableCell>
-            {user.currentUser.role === "admin" && (
+            {auth.currentUser.role === "admin" && (
               <TableCell align="center">Delete</TableCell>
             )}
           </TableRow>
@@ -92,16 +56,17 @@ export default function AuthorTable({
                 key={author.id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
+                {console.log(author.id)}
                 <TableCell>{usersById[author.userId].name}</TableCell>
                 <TableCell align="center">{author.startTime}</TableCell>
-                <TableCell align="center">{author.startTime}</TableCell>
+                <TableCell align="center">{author.endTime}</TableCell>
                 <TableCell align="center">
                   {usersById[author.userId].email}
                 </TableCell>
                 <TableCell align="center">
                   {usersById[author.userId].phoneNumber}
                 </TableCell>
-                {user.currentUser.role === "admin" && (
+                {auth.currentUser.role === "admin" && (
                   <TableCell
                     align="center"
                     onClick={() => deleteAuthor(author.id)}

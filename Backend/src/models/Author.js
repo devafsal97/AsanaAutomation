@@ -8,13 +8,11 @@ class Author {
   }
 
   async save() {
-    try {
-      const response = await firestore.db
-        .collection("Authors")
-        .add({ ...this });
-      return response;
-    } catch (err) {
-      console.log(err);
+    const author = { ...this };
+    const authorById = await Author.findByUserId(author.userId);
+    if (authorById == null) {
+      const response = await firestore.db.collection("Authors").add(author);
+      return Author.findById(response._path.segments[1]);
     }
   }
 
@@ -37,57 +35,37 @@ class Author {
       } else {
         return "no data found to update";
       }
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   }
 
   static async findById(id) {
     const authorDoc = await firestore.db.collection("Authors").doc(id).get();
     if (authorDoc.exists) {
-      return authorDoc.data();
+      return { id, ...authorDoc.data() };
     } else {
       return null;
     }
   }
 
-  static async findById(id) {
-    const authorDoc = await firestore.db.collection("Authors").doc(id).get();
-    if (authorDoc.exists) {
-      return authorDoc.data();
-    } else {
-      return null;
-    }
+  static async getAll() {
+    const snapShot = await firestore.db.collection("Authors").get();
+
+    const authorsData = snapShot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    return authorsData;
   }
 
-  static async getAll(keyword) {
-    console.log("keyword", keyword);
-    try {
-      if (!keyword) {
-        const snapShot = await firestore.db.collection("Authors").get();
-
-        console.log("doc", snapShot.docs[0]);
-
-        const authorsData = snapShot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        return authorsData;
-      } else {
-        const snapShot = await firestore.db
-          .collection("Authors")
-          .where("name", ">=", keyword)
-          .where("name", "<=", keyword + "\uf8ff")
-          .get();
-        const authorsData = snapShot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        return authorsData;
-      }
-    } catch (error) {
-      console.log(error);
-      return "Error retrieving tasks";
+  static async findByUserId(userId) {
+    const authorDoc = await firestore.db
+      .collection("Authors")
+      .where("userId", "==", userId)
+      .get();
+    if (authorDoc.docs.length == 0) {
+      return null;
+    } else {
+      throw new Error("author already exist");
     }
   }
 }

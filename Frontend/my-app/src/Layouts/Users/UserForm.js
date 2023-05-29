@@ -10,7 +10,6 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 
 const UserForm = ({ isOpen, toggleDrawer, user = {}, addUserHandler }) => {
-  console.log(user);
   const data = {
     ...{
       name: "",
@@ -43,7 +42,6 @@ const UserForm = ({ isOpen, toggleDrawer, user = {}, addUserHandler }) => {
         })}
         onSubmit={(values) => {
           addUserHandler(values);
-          console.log(values);
         }}
       >
         {(formik) => (

@@ -6,9 +6,9 @@ exports.create = async (req, res) => {
     const newUser = new User(req.body);
 
     const user = await newUser.save();
-    res.json({ success: true, user });
+    res.json({ success: true, data: user });
   } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
+    res.json({ success: false, error: error.message });
   }
 };
 
@@ -18,9 +18,12 @@ exports.getById = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
-  console.log("req body", req.body);
-  const user = await User.update(req.body);
-  res.json({ success: true, user });
+  try {
+    const user = await User.update(req.body);
+    res.json({ success: true, data: user });
+  } catch {
+    res.json({ success: false, error: error.message });
+  }
 };
 
 exports.getUsers = async (req, res) => {
