@@ -26,35 +26,40 @@ const AuthorForm = ({ isOpen, toggleDrawer, addAuthorHandler }) => {
   const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState("");
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const data = {
     userId: "",
-    startTime: "",
-    endTime: "",
+    startTime: null,
+    endTime: null,
   };
 
   const onDateChangeHandler = (date, formik, key) => {
-    const time = new Date(date.$d).toLocaleString("en-US", {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    });
     if (key == "startTime") {
-      formik.setFieldValue("startTime", time);
+      formik.setFieldValue("startTime", date);
+      setStartDate(
+        new Date(date.$d).toLocaleString("en-US", {
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true,
+        })
+      );
     } else {
-      formik.setFieldValue("endTime", time);
+      setEndDate(
+        new Date(date.$d).toLocaleString("en-US", {
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true,
+        })
+      );
+      formik.setFieldValue("endTime", date);
     }
   };
 
   const getUsers = async () => {
-    console.log("get users called");
-
-    let url = `http://localhost:8000/users`;
-    try {
-      const response = await axiosInstance.get(url);
-      setUsers(response.data);
-    } catch (error) {
-      console.log(error);
-    }
+    let url = `${process.env.REACT_APP_ServerUrl}/users`;
+    const response = await axiosInstance.get(url);
+    setUsers(response.data.data);
   };
 
   useEffect(() => {
@@ -72,7 +77,11 @@ const AuthorForm = ({ isOpen, toggleDrawer, addAuthorHandler }) => {
           endTime: Yup.string().required("endtime is required"),
         })}
         onSubmit={(values) => {
-          addAuthorHandler(values);
+          addAuthorHandler({
+            userId: values.userId,
+            startTime: startDate,
+            endTime: endDate,
+          });
         }}
       >
         {(formik) => (

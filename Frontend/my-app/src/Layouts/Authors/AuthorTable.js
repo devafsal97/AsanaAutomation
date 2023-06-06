@@ -19,7 +19,7 @@ export default function AuthorTable({ onClickDeleteHandler, authors, users }) {
 
   const deleteAuthor = async (id) => {
     console.log(id);
-    let url = `http://localhost:8000/authors/${id}`;
+    let url = `${process.env.REACT_APP_ServerUrl}/authors/${id}`;
     const response = await axiosInstance.delete(url);
     if (response.data.success) {
       onClickDeleteHandler(id);

@@ -39,7 +39,7 @@ function App() {
   const isTokenValid = async () => {
     try {
       const response = await axiosInstance.get(
-        "http://localhost:8000/validateToken"
+        `${process.env.REACT_APP_ServerUrl}/validateToken`
       );
 
       if (response.data.success) {
@@ -47,6 +47,7 @@ function App() {
           isLoggedIn: true,
           currentUser: response.data.user,
         });
+        console.log("logged user", response.data.user);
       }
     } catch (error) {
       console.log("Error:", error);

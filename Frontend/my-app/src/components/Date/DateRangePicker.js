@@ -6,7 +6,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { width } from "@mui/system";
 import { format } from "date-fns";
 
-const DateRangePicker = ({ text, ondateChange }) => {
+const DateRangePicker = ({ text, ondateChange, value }) => {
   const onDateChangeHandler = (date) => {
     const formattedDate = format(date.$d, "yyyy/MM/dd");
     ondateChange(formattedDate, text);
@@ -15,6 +15,7 @@ const DateRangePicker = ({ text, ondateChange }) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DatePicker
+        value={value}
         sx={{ marginRight: "10px" }}
         onChange={(date) => onDateChangeHandler(date)}
         label={text}

@@ -1,23 +1,26 @@
 import Drawer from "components/Drawer";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import axiosInstance from "utils/axiosinstance";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import { loggedInContext } from "App";
+
 const Comments = ({ open, closeDrawer, commentToastHandler }) => {
   const [comments, setComments] = useState([]);
   const [commentOnDelay, setCommentOnDelay] = useState("");
   const [commentOnComepleted, setCommentOnCompleted] = useState("");
   const [editCommentOnDelay, setEditCommentOnDelay] = useState(false);
   const [editCommentOnCompleted, setEditCommentOnCompleted] = useState(false);
+  const { auth, setIsLoggedIn } = useContext(loggedInContext);
 
   useEffect(() => {
     getComments();
   }, []);
 
   const getComments = async () => {
-    let url = `http://localhost:8000/comments`;
+    let url = `${process.env.REACT_APP_ServerUrl}/comments`;
     const response = await axiosInstance.get(url);
     setComments(response.data);
     setCommentOnDelay(response.data[0].comment);
@@ -67,7 +70,7 @@ const Comments = ({ open, closeDrawer, commentToastHandler }) => {
                 fullWidth
                 multiline
                 rows={4}
-                sx={{ mb: 2 }}
+                sx={{ mb: !commentOnDelay.length ? 0 : 2 }}
                 label={comments[0].name}
                 defaultValue={commentOnDelay}
                 onChange={(event) => onDelayCommentChange(event)}
@@ -75,14 +78,22 @@ const Comments = ({ open, closeDrawer, commentToastHandler }) => {
                   editCommentOnDelay ? { readOnly: false } : { readOnly: true }
                 }
               ></TextField>
+              {!commentOnDelay.length && (
+                <Typography sx={{ color: "red", fontSize: "12px" }}>
+                  comment is required
+                </Typography>
+              )}
               {console.log("edit delay", editCommentOnDelay)}
-              <Button
-                variant="contained"
-                sx={{ mb: 2 }}
-                onClick={onClickOnDelayed}
-              >
-                {editCommentOnDelay ? "Save" : "Edit"}
-              </Button>
+              {auth.currentUser.role == "admin" && (
+                <Button
+                  variant="contained"
+                  sx={{ mb: 2 }}
+                  onClick={onClickOnDelayed}
+                  disabled={!commentOnDelay.length ? true : false}
+                >
+                  {editCommentOnDelay ? "Save" : "Edit"}
+                </Button>
+              )}
             </Box>
           </Box>
           <Box sx={{ width: "100%", marginBottom: "10px" }}>
@@ -101,13 +112,21 @@ const Comments = ({ open, closeDrawer, commentToastHandler }) => {
                     : { readOnly: true }
                 }
               ></TextField>
-              <Button
-                variant="contained"
-                sx={{ mb: 2 }}
-                onClick={onClickCompleted}
-              >
-                {editCommentOnCompleted ? "Save" : "edit"}
-              </Button>
+              {!commentOnComepleted.length && (
+                <Typography sx={{ color: "red", fontSize: "12px" }}>
+                  comment is required
+                </Typography>
+              )}
+              {auth.currentUser.role == "admin" && (
+                <Button
+                  variant="contained"
+                  sx={{ mb: 2 }}
+                  onClick={onClickCompleted}
+                  disabled={!commentOnComepleted.length ? true : false}
+                >
+                  {editCommentOnCompleted ? "Save" : "edit"}
+                </Button>
+              )}
             </Box>
           </Box>
         </Box>

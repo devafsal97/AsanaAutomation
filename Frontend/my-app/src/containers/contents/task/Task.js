@@ -94,24 +94,20 @@ const Task = ({ open, closeDrawer, selectedTask }) => {
                 Call Status:
               </Typography>
               <Typography>
-                {selectedTask.currentAuthotCallStatus.callStatus}
+                {selectedTask.authorCallStatus.callStatus}
               </Typography>
             </Box>
             <Box sx={boxStyle}>
               <Typography sx={{ marginRight: "15px" }} variant="subtitle1">
                 Time:
               </Typography>
-              <Typography>
-                {selectedTask.currentAuthotCallStatus.timeStamp}
-              </Typography>
+              <Typography>{selectedTask.authorCallStatus.timeStamp}</Typography>
             </Box>
             <Box sx={boxStyle}>
               <Typography sx={{ marginRight: "15px" }} variant="subtitle1">
                 number
               </Typography>
-              <Typography>
-                {selectedTask.currentAuthotCallStatus.number}
-              </Typography>
+              <Typography>{selectedTask.authorCallStatus.number}</Typography>
             </Box>
           </Box>
         </Box>

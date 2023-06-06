@@ -22,7 +22,10 @@ exports.update = async (req, res) => {
 };
 
 exports.getEscalationContacts = async (req, res) => {
-  console.log("escalation received");
-  const response = await Escalation.getAll();
-  res.json(response);
+  try {
+    const response = await Escalation.getAll();
+    res.json({ success: true, data: response });
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
 };

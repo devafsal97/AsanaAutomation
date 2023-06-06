@@ -50,19 +50,15 @@ class Escalation {
   }
 
   static async getAll() {
-    try {
-      const snapShot = await firestore.db
-        .collection("EscalationContacts")
-        .get();
-
+    const snapShot = await firestore.db.collection("EscalationContacts").get();
+    if (!!snapShot.docs.length) {
       const escalationData = snapShot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
       return escalationData;
-    } catch (error) {
-      console.log(error);
-      return "Error retrieving tasks";
+    } else {
+      throw new Error("no escalation data found");
     }
   }
 

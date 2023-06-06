@@ -84,13 +84,14 @@ class Task {
       }
     }
   }
-  static async getByDate(startDate, endDate) {
+  static async getByDate(startDate, endDate, limit, offset) {
     const tasksRef = await firestore.db
       .collection("Tasks")
-      .where("created_at", ">=", new Date(startDate))
-      .where("created_at", "<=", new Date(endDate))
+      .where("createdAt", ">=", new Date(startDate))
+      .where("createdAt", "<=", new Date(endDate))
+      .limit(parseInt(limit))
+      .offset(parseInt(offset))
       .get();
-    console.log("hello");
     if (!tasksRef.empty) {
       console.log("data doc", tasksRef.docs);
       const data = tasksRef.docs.map((doc) => {

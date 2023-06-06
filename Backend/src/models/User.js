@@ -42,31 +42,17 @@ class User {
     }
   }
 
-  static async getAll(keyword) {
-    try {
-      if (!keyword) {
-        const snapShot = await firestore.db.collection("Users").get();
-
-        const usersData = snapShot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        return usersData;
-      } else {
-        const snapShot = await firestore.db
-          .collection("Users")
-          .where("name", ">=", keyword)
-          .where("name", "<=", keyword + "\uf8ff")
-          .get();
-        const usersData = snapShot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        return usersData;
-      }
-    } catch (error) {
-      console.log(error);
-      return "Error retrieving tasks";
+  static async getAll() {
+    console.log("get user called");
+    const snapShot = await firestore.db.collection("Users").get();
+    if (!!snapShot.docs.length) {
+      const usersData = snapShot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      return usersData;
+    } else {
+      throw new Error("no users available");
     }
   }
   static async findUserByEmail(email) {

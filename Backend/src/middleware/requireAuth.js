@@ -11,6 +11,7 @@ const requireAuth = (allowedRoles) => {
           return next(err);
         }
         if (!user) {
+          console.log("user from req", user);
           return res.status(401).json("unauthorized").end();
         }
         console.log(user.role);

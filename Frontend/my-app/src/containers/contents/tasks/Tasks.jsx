@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import SearchIcon from "@mui/icons-material/Search";
 import Button from "@mui/material/Button";
-
 import axiosInstance from "../../../utils/axiosinstance";
 import "./Tasks.css";
 import Task from "../task/Task";
@@ -17,14 +15,14 @@ const Tasks = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedTask, setSelectedTask] = useState({});
-  const [modalVisible, setModalVisible] = useState(false);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const [open, setToastOpen] = useState(false);
   const [message, setToastMessage] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [severity, setToastSeverity] = useState("success");
+  const [filterState, setFilterState] = useState(false);
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
@@ -70,8 +68,7 @@ const Tasks = () => {
     const limit = 8;
     const offset = (currentPage - 1) * limit;
 
-    let url = `http://localhost:8000/tasks?limit=${limit}&offset=${offset}`;
-
+    let url = `${process.env.REACT_APP_ServerUrl}/tasks?limit=${limit}&offset=${offset}`;
     if (searchKeyword) {
       url = url.concat(`&keyword=${searchKeyword}`);
     }
@@ -89,19 +86,33 @@ const Tasks = () => {
   };
 
   const getTaskByDate = async () => {
-    if (startDate.length > 0 && endDate.length > 0) {
-      let url = `http://localhost:8000/tasks/getByDate?startDate=${startDate}&endDate=${endDate}`;
-      const response = await axiosInstance.get(url);
-      if (response.data.success) {
-        setTasks(response.data.data);
+    if (filterState) {
+      setFilterState(false);
+      setStartDate(null);
+      setEndDate(null);
+      if (currentPage != 1) {
+        setCurrentPage(1);
       } else {
-        setToastMessage(response.data.error);
-        setToastOpen(true);
+        getTasks();
       }
     } else {
-      setToastMessage("please select the date range");
-      setToastSeverity("error");
-      setToastOpen(true);
+      setFilterState(true);
+      const limit = 8;
+      const offset = (currentPage - 1) * limit;
+      if (startDate != null && endDate != null) {
+        let url = `${process.env.REACT_APP_ServerUrl}/tasks/getByDate?startDate=${startDate}&endDate=${endDate}&limit=${limit}&offset=${offset}`;
+        const response = await axiosInstance.get(url);
+        if (response.data.success) {
+          setTasks(response.data.data);
+        } else {
+          setToastMessage(response.data.error);
+          setToastOpen(true);
+        }
+      } else {
+        setToastMessage("please select the date range");
+        setToastSeverity("error");
+        setToastOpen(true);
+      }
     }
   };
 
@@ -120,7 +131,11 @@ const Tasks = () => {
   };
 
   useEffect(() => {
-    getTasks();
+    if (startDate != null && endDate != null) {
+      getTaskByDate();
+    } else {
+      getTasks();
+    }
   }, [currentPage]);
 
   return (
@@ -154,14 +169,22 @@ const Tasks = () => {
           >
             Comments
           </Button>
-          <DateRangePicker text="StartDate" ondateChange={dateChangeHandler} />
-          <DateRangePicker text="EndDate" ondateChange={dateChangeHandler} />
+          <DateRangePicker
+            text="StartDate"
+            ondateChange={dateChangeHandler}
+            value={startDate}
+          />
+          <DateRangePicker
+            text="EndDate"
+            ondateChange={dateChangeHandler}
+            value={endDate}
+          />
           <Button
             sx={{ marginRight: "10px" }}
             variant="contained"
             onClick={getTaskByDate}
           >
-            Filter
+            {filterState ? "Clear" : "Filter"}
           </Button>
           <SearchComponent
             onCloseHandler={onCloseHandler}

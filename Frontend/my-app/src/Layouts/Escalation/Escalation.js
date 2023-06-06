@@ -26,7 +26,7 @@ const Escalation = () => {
   };
 
   const updateEscalationHandler = async (data) => {
-    let url = `http://localhost:8000/escalation`;
+    let url = `${process.env.REACT_APP_ServerUrl}/escalation`;
     const response = await axiosInstance.put(url, data);
 
     if (response.data.success) {
@@ -51,22 +51,23 @@ const Escalation = () => {
   };
 
   const getEscalation = async () => {
-    let url = `http://localhost:8000/escalation`;
-    try {
-      const response = await axiosInstance.get(url);
-      setEscalation(response.data);
-    } catch (error) {
-      console.log(error);
+    let url = `${process.env.REACT_APP_ServerUrl}/escalation`;
+    const response = await axiosInstance.get(url);
+    if (response.data.success) {
+      setEscalation(response.data.data);
+    } else {
+      setEscalation([]);
     }
   };
 
   const getUsers = async () => {
-    let url = `http://localhost:8000/users`;
-    try {
-      const response = await axiosInstance.get(url);
-      setUsers(response.data);
-    } catch (error) {
-      console.log(error);
+    let url = `${process.env.REACT_APP_ServerUrl}/users`;
+
+    const response = await axiosInstance.get(url);
+    if (response.data.success) {
+      setUsers(response.data.data);
+    } else {
+      setUsers([]);
     }
   };
   const usersById = useMemo(() => {

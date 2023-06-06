@@ -4,8 +4,8 @@ const router = express.Router();
 
 const webhookController = require("../controller/WebhokController");
 
-router.post("/change-section", webhookController.setionChange_Post);
+router.post("/section-change", webhookController.setionChange_Post);
 
-router.post("/registerwebhooke", webhookController.create_task_emer_post);
+router.post("/register-webhook", webhookController.create_task_emer_post);
 
 module.exports = router;

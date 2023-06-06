@@ -17,7 +17,6 @@ const MainListItems = () => {
         <ListItemIcon>
           <AssignmentIcon />
         </ListItemIcon>
-
         <ListItemText primary="Tasks" />
       </ListItemButton>
       <ListItemButton component={NavLink} to="/authors">

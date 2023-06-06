@@ -68,7 +68,7 @@ export default function DataTable({ taskList, handleTaskClick }) {
                 {convertTime(task.createdAt)}
               </TableCell>
               <TableCell align="center" onClick={() => taskClickHandler(task)}>
-                {task.turnAroundTime}
+                {task.turnArroundTime}
               </TableCell>
               <TableCell align="center" onClick={() => taskClickHandler(task)}>
                 {task.author}

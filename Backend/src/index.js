@@ -17,10 +17,11 @@ const escalationRoutes = require("./routes/escalationRoute");
 const commentsRoutes = require("./routes/commentRoutes");
 const webhookRoutes = require("./routes/webhookRoutes");
 const twilioRoutes = require("./routes/twilioRoutes");
+require("dotenv").config();
 
 app.use(
   session({
-    secret: "your-secret-key",
+    secret: process.env.JWTSecretKey,
     resave: false,
     saveUninitialized: false,
   })
@@ -66,9 +67,9 @@ app.get(
       {
         id: req.user.id,
       },
-      "mysecretkey"
+      process.env.JWTSecretKey
     );
-    res.redirect(`http://localhost:3000/auth/success?token=${token}`);
+    res.redirect(`${process.env.FrontEndUrl}/auth/success?token=${token}`);
   }
 );
 app.get("/failed", (req, res) => {

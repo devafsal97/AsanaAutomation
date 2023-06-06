@@ -21,13 +21,16 @@ exports.update = async (req, res) => {
   try {
     const user = await User.update(req.body);
     res.json({ success: true, data: user });
-  } catch {
+  } catch (error) {
     res.json({ success: false, error: error.message });
   }
 };
 
 exports.getUsers = async (req, res) => {
-  console.log("eached");
-  const response = await User.getAll();
-  res.json(response);
+  try {
+    const response = await User.getAll();
+    res.json({ success: true, data: response });
+  } catch (error) {
+    res.json({ success: false, data: error.message });
+  }
 };

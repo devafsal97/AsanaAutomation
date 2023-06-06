@@ -8,6 +8,7 @@ import IconButton from "@mui/material/IconButton";
 import axiosInstance from "utils/axiosinstance";
 import Toast from "components/Toast/Toast";
 import { loggedInContext } from "App";
+import { useRouteLoaderData } from "react-router-dom";
 
 const Users = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -23,9 +24,11 @@ const Users = () => {
   }, []);
 
   const getUsers = async () => {
-    let url = `http://localhost:8000/users`;
+    let url = `${process.env.REACT_APP_ServerUrl}/users`;
+    console.log("url", url);
     const response = await axiosInstance.get(url);
-    setUsers(response.data);
+    console.log("users", response.data.data);
+    setUsers(response.data.data);
   };
 
   const toggleDrawer = () => {
@@ -56,7 +59,7 @@ const Users = () => {
   const addUserHandler = async (data) => {
     if (user) {
       const response = await axiosInstance.put(
-        `http://localhost:8000/users/${user.id}`,
+        `${process.env.REACT_APP_ServerUrl}/users/${user.id}`,
         data
       );
       if (response.data.success) {
@@ -77,7 +80,7 @@ const Users = () => {
       }
     } else {
       const response = await axiosInstance.post(
-        "http://localhost:8000/users/",
+        `${process.env.REACT_APP_ServerUrl}/users/`,
         data
       );
       if (response.data.success) {

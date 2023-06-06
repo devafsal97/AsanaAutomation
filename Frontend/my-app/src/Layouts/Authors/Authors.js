@@ -44,30 +44,32 @@ const Authors = () => {
   };
 
   const getAuthors = async () => {
-    let url = `http://localhost:8000/authors`;
-    try {
-      const response = await axiosInstance.get(url);
-      console.log(response.data);
-      setAuthors(response.data);
-    } catch (error) {
-      console.log(error);
+    let url = `${process.env.REACT_APP_ServerUrl}/authors`;
+    const response = await axiosInstance.get(url);
+    if (response.data.success) {
+      console.log(response.data.data);
+      setAuthors(response.data.data);
+      console.log("authors from authors", authors);
+    } else {
+      setAuthors([]);
     }
   };
 
   const getUsers = async () => {
-    let url = `http://localhost:8000/users`;
-    try {
-      const response = await axiosInstance.get(url);
-      setUsers(response.data);
-    } catch (error) {
-      console.log(error);
+    let url = `${process.env.REACT_APP_ServerUrl}/users`;
+    console.log("url", url);
+    const response = await axiosInstance.get(url);
+    if (response.data.success) {
+      console.log("users", response.data.data);
+      setUsers(response.data.data);
+      console.log("Users from authors", users);
     }
   };
 
   const addAuthorHandler = async (data) => {
     console.log("data", data);
     const response = await axiosInstance.post(
-      "http://localhost:8000/authors/",
+      `${process.env.REACT_APP_ServerUrl}/authors/`,
       data
     );
     if (response.data.success) {

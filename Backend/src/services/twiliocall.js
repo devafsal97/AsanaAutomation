@@ -2,6 +2,7 @@ const firestore = require("./firestoreCrud");
 const Escalation = require("../models/Escalation");
 const Task = require("../models/Task");
 const User = require("../models/User");
+require("dotenv").config();
 
 exports.notifyCurrentAuthor = async (data, gid) => {
   phoneNumber = data;
@@ -155,15 +156,15 @@ exports.updateCallStatus = async (
 };
 
 exports.generateCall = async (number, priority, gid) => {
-  const accountSid = "AC1ca42dfe718f96ef4489ffef386cd2f1";
-  const authToken = "1d327728eca86b5890f0fbcfa3beaf5c";
+  const accountSid = process.env.TwilioAccounSid;
+  const authToken = process.env.TwilioAuthToken;
   const client = require("twilio")(accountSid, authToken);
 
   client.calls.create({
     url: "http://demo.twilio.com/docs/voice.xml",
     to: number,
     from: "+16204559131",
-    statusCallback: `https://d8f5-103-243-45-85.ngrok-free.app/twilio/status-callback?callPriority=${priority}&gid=${gid}`,
+    statusCallback: `${process.env.ServerUrl}/twilio/status-callback?callPriority=${priority}&gid=${gid}`,
     statusCallbackEvent: ["answered", "completed"],
     statusCallbackMethod: "POST",
   });

@@ -42,7 +42,9 @@ exports.getByDate = async (req, res) => {
     console.log("reached getbydate", req.query.startDate, req.query.endDate);
     const response = await Task.getByDate(
       req.query.startDate,
-      req.query.endDate
+      req.query.endDate,
+      req.query.limit,
+      req.query.offset
     );
     console.log("response", response);
     res.json({ success: true, data: response });

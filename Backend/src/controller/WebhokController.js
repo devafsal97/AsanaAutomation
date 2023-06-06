@@ -7,126 +7,198 @@ const moment = require("moment");
 const Task = require("../models/Task");
 const tatCaculator = require("../services/tatCalculator");
 const Comment = require("../models/Comment");
+const crypto = require("crypto");
+const fs = require("fs");
+var path = require("path");
+const firestoreAdmin = require("firebase-admin");
+const { threadId } = require("worker_threads");
+require("dotenv").config();
 
 exports.create_task_emer_post = async (req, res) => {
-  if (req.header("x-hook-secret")) {
-    secret = req.header("x-hook-secret");
-    res.setHeader("x-hook-secret", secret);
-    res.sendStatus(200);
-  } else if (req.header("x-hook-signature")) {
-    // console.log("emrgency events",req.body.events[0])
-    // const computedSignature = crypto.createHmac("SHA256",secret)
-    // .update(JSON.stringify(req.body))
-    // .digest("hex");
+  try {
+    console.log("webhook recieved");
+    const requestBody = JSON.stringify(req.body);
 
-    // if(!crypto.timingSafeEqual(
-    //     Buffer.from(req.header("x-hook-signature")),
-    //     Buffer.from(computedSignature)
-    // )){
-    //     res.sendStatus(401);
-    // }else{
-    res.sendStatus(200);
-    if (req.body.events[0].change.new_value.gid === "1204569783901849") {
-      const taskId = req.body.events[0].resource.gid;
-      const taskDetails = await getTaskDetails(taskId);
-      const date = new Date().toLocaleString();
-      const customfield = taskDetails.data.custom_fields;
-      const timingStatus = customfield.find(
-        (item) => item.gid === "1204569783901849"
-      );
-      if (
-        timingStatus.display_value === "Emergency" ||
-        timingStatus.display_value === "Exception"
-      ) {
-        startTimer(taskId);
-
-        const authors = await Author.getAll();
-        const authorArray = authors.filter((author) => {
-          const startTime = moment(author.startTime, "h:mm a");
-          const endTime = moment(author.endTime, "h:mm a");
-
-          const currentTime = moment();
-          if (endTime.isBefore(startTime)) {
-            startTime.add(-1, "day");
-          }
-          if (currentTime.isBetween(startTime, endTime)) {
-            return author;
+    if (req.header("X-Hook-Secret")) {
+      xHookSecret = req.header("X-Hook-Secret");
+      console.log(xHookSecret);
+      console.log("X-Hook-Secret true");
+      fs.writeFile(
+        path.join(__dirname, "..", "constants", "xhookSecret.txt"),
+        xHookSecret,
+        (err) => {
+          if (err) {
+            console.error("Error writing secret file:", err);
           } else {
-            console.log("Current time is not between the start and end times.");
+            console.log("Secret file saved successfully");
           }
-        });
+        }
+      );
+      res.setHeader("X-Hook-Secret", xHookSecret);
+      res.sendStatus(200);
+    } else if (req.header("X-Hook-Signature")) {
+      const xHookSignature = req.header("X-Hook-Signature");
+      console.log("reached");
 
-        const currentAuthor = await User.findById(authorArray[0].userId);
+      const xHookSecret = fs.readFileSync(
+        path.join(__dirname, "..", "constants", "xhookSecret.txt"),
+        "utf8"
+      );
 
-        const taskUrlresponse = await getTaskUrl(taskId);
-        const taskUrl = taskUrlresponse.data.data.permalink_url;
-        const task = new Task({
-          name: taskDetails.data.name,
-          createdAt: date,
-          author: currentAuthor.name,
-          authorCallStatus: {},
-          escalationProcess: [],
-          gid: taskDetails.data.gid,
-          inProgressTime: "",
-          completedTime: "",
-          turnArroundTime: "",
-          url: taskUrl,
-        });
+      const calculatedSignature = crypto
+        .createHmac("sha256", xHookSecret)
+        .update(requestBody)
+        .digest("hex");
 
-        await task.save();
+      if (calculatedSignature === xHookSignature) {
+        console.log("valid signature");
+        res.sendStatus(200);
+        console.log("evenst", req.body.events);
+        if (!!req.body.events.length) {
+          if (
+            req.body.events[0].change.new_value.gid ===
+            process.env.TimingCustomFiledId
+          ) {
+            console.log("daataaaaa", req.body.events[0].resource);
+            const taskId = req.body.events[0].resource.gid;
+            const taskDetails = await getTaskDetails(taskId);
+            const date = firestoreAdmin.firestore.FieldValue.serverTimestamp();
+            const customfield = taskDetails.data.custom_fields;
+            const timingStatus = customfield.find(
+              (item) => item.gid === process.env.TimingCustomFiledId
+            );
+            if (
+              timingStatus.display_value === "Emergency" ||
+              timingStatus.display_value === "Exception"
+            ) {
+              startTimer(taskId);
 
-        await twilio.notifyCurrentAuthor(currentAuthor.phoneNumber, taskId);
+              const authors = await Author.getAll();
+              const authorArray = authors.filter((author) => {
+                const startTime = moment(author.startTime, "h:mm a");
+                const endTime = moment(author.endTime, "h:mm a");
+
+                const currentTime = moment();
+                if (endTime.isBefore(startTime)) {
+                  endTime.add(1, "day");
+                }
+                if (currentTime.isBetween(startTime, endTime)) {
+                  return author;
+                } else {
+                  console.log(
+                    "Current time is not between the start and end times."
+                  );
+                }
+              });
+              if (!!authorArray.length) {
+                const currentAuthor = await User.findById(
+                  authorArray[0].userId
+                );
+
+                const taskUrlresponse = await getTaskUrl(taskId);
+                const taskUrl = taskUrlresponse.data.data.permalink_url;
+                const task = new Task({
+                  name: taskDetails.data.name,
+                  createdAt: date,
+                  author: currentAuthor.name,
+                  authorCallStatus: {},
+                  escalationProcess: [],
+                  gid: taskDetails.data.gid,
+                  inProgressTime: "",
+                  completedTime: "",
+                  turnArroundTime: "",
+                  url: taskUrl,
+                });
+
+                await task.save();
+
+                await twilio.notifyCurrentAuthor(
+                  currentAuthor.phoneNumber,
+                  taskId
+                );
+              } else {
+                throw new Error("No author Found");
+              }
+            }
+          } else {
+            throw new Error("not the timing custom field value changed");
+          }
+        }
+      } else {
+        console.log("Invalid signature!");
+        res.status(403).send("Forbidden");
       }
     }
+  } catch (error) {
+    console.log(error.message);
   }
 };
 
 exports.setionChange_Post = async (req, res) => {
-  if (req.header("x-hook-secret")) {
-    console.log("this is new webhook");
-    secret = req.header("x-hook-secret");
-    res.setHeader("x-hook-secret", secret);
-    res.sendStatus(200);
-  } else if (req.header("x-hook-signature")) {
-    // const computedSignature = crypto.createHmac("SHA256",secret)
-    // .update(JSON.stringify(req.body))
-    // .digest("hex");
+  const requestBody = JSON.stringify(req.body);
 
-    // if(!crypto.timingSafeEqual(
-    //     Buffer.from(req.header("x-hook-signature")),
-    //     Buffer.from(computedSignature)
-    // )){
-    //     res.sendStatus(401);
-    // }else{
-    res.sendStatus(200);
-    const taskId = req.body.events[0].parent.gid;
-    const date = new Date().toLocaleString();
-    const taskDetails = await getTaskDetails(taskId);
-    const customfield = taskDetails.data.custom_fields;
-    const timingStatus = customfield.find(
-      (item) => item.gid === "1204569783901849"
+  if (req.header("X-Hook-Secret")) {
+    xHookSecret = req.header("X-Hook-Secret");
+    console.log(xHookSecret);
+    console.log("X-Hook-Secret true");
+    fs.writeFile(
+      path.join(__dirname, "..", "constants", "sectionChangeSecret.txt"),
+      xHookSecret,
+      (err) => {
+        if (err) {
+          console.error("Error writing secret file:", err);
+        } else {
+          console.log("Secret file saved successfully");
+        }
+      }
     );
-    if (
-      timingStatus.display_value === "Emergency" ||
-      timingStatus.display_value === "Exception"
-    ) {
-      const status = taskDetails.data.memberships[0].section.name;
-      if (status == "In Progress" || status == "Published") {
-        await updateTaskProgress(taskId, status, date);
+    res.setHeader("X-Hook-Secret", xHookSecret);
+    res.sendStatus(200);
+  } else if (req.header("X-Hook-Signature")) {
+    const xHookSignature = req.header("X-Hook-Signature");
+    console.log("reached");
+
+    const xHookSecret = fs.readFileSync(
+      path.join(__dirname, "..", "constants", "sectionChangeSecret.txt"),
+      "utf8"
+    );
+
+    const calculatedSignature = crypto
+      .createHmac("sha256", xHookSecret)
+      .update(requestBody)
+      .digest("hex");
+
+    if (calculatedSignature === xHookSignature) {
+      console.log("valide sign");
+      res.sendStatus(200);
+      if (!!req.body.events.length) {
+        const taskId = req.body.events[0].parent.gid;
+        const date = new Date().toLocaleString();
+        const taskDetails = await getTaskDetails(taskId);
+        const customfield = taskDetails.data.custom_fields;
+        const timingStatus = customfield.find(
+          (item) => item.gid === process.env.TimingCustomFiledId
+        );
+        if (
+          timingStatus.display_value === "Emergency" ||
+          timingStatus.display_value === "Exception"
+        ) {
+          const status = taskDetails.data.memberships[0].section.name;
+          if (status == "In Progress" || status == "Published") {
+            await updateTaskProgress(taskId, status, date);
+          }
+        }
       }
     }
   }
 };
 
 async function getTaskDetails(id) {
-  const response = await axios.get(
-    `https://app.asana.com/api/1.0/tasks/${id}`,
-    {
-      headers: {
-        Authorization: `Bearer 1/1204569739108552:c7540c050a75c47debbebec51aaab986`,
-      },
-    }
-  );
+  const response = await axios.get(`${process.env.AsanaTaskApi}/${id}`, {
+    headers: {
+      Authorization: `Bearer ${process.env.AsanaAccessToken}`,
+    },
+  });
   return response.data;
 }
 
@@ -134,7 +206,7 @@ const functionAfter2Minutes = async (taskId) => {
   getTaskDetails(taskId).then(async (taskDetails) => {
     const section = taskDetails.data.memberships[0].section.name;
     if (section != "In Progress") {
-      await twilio.escalationCallDefiner(taskDetails.data.gid);
+      // await twilio.escalationCallDefiner(taskDetails.data.gid);
     }
   });
 };
@@ -144,7 +216,7 @@ const functionAfter15Minutes = async (taskId) => {
   const section = taskDetails.data.memberships[0].section.name;
   if (section != "Published" && section == "In Progress") {
     const comment = await Comment.getByName("Comment On Delay");
-    await addComment(taskId, comment.comment);
+    // await addComment(taskId, comment.comment);
   }
 };
 
@@ -179,7 +251,7 @@ const updateTaskProgress = async (taskId, status, date) => {
 };
 
 const addComment = async (gid, comment) => {
-  const accessToken = "1/1204569739108552:c7540c050a75c47debbebec51aaab986";
+  const accessToken = process.env.AsanaAccessToken;
 
   const commentText = comment;
 
@@ -197,7 +269,7 @@ const addComment = async (gid, comment) => {
 
   axios
     .post(
-      `https://app.asana.com/api/1.0/tasks/${gid}/stories?opt_fields=`,
+      `${process.env.AsanaTaskApi}/${gid}/stories?opt_fields=`,
       requestBody,
       { headers: requestHeaders }
     )
@@ -210,7 +282,7 @@ const addComment = async (gid, comment) => {
 };
 
 const getTaskUrl = async (gid) => {
-  const accessToken = "1/1204569739108552:c7540c050a75c47debbebec51aaab986";
+  const accessToken = process.env.AsanaAccessToken;
   const taskId = gid;
 
   const requestHeaders = {
@@ -220,7 +292,7 @@ const getTaskUrl = async (gid) => {
   };
 
   const taskUrl = await axios.get(
-    `https://app.asana.com/api/1.0/tasks/${taskId}?opt_fields=permalink_url`,
+    `${process.env.AsanaTaskApi}/${taskId}?opt_fields=permalink_url`,
     { headers: requestHeaders }
   );
   return taskUrl;

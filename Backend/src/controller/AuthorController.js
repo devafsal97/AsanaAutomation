@@ -12,26 +12,38 @@ exports.create = async (req, res) => {
 };
 
 exports.getById = async (req, res) => {
-  const response = await Author.findById(req.query.id);
-  return res.json(response);
+  try {
+    const response = await Author.findById(req.query.id);
+    res.json({ success: true, data: response });
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
 };
 
 exports.update = async (req, res) => {
-  const response = await Author.update(req.body);
-  res.json(response);
+  try {
+    const response = await Author.update(req.body);
+    res.json({ success: true, data: response });
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
 };
 
 exports.getAuthors = async (req, res) => {
-  const response = await Author.getAll();
-  res.json(response);
+  try {
+    const response = await Author.getAll();
+    res.json({ success: true, data: response });
+  } catch (error) {
+    res.json({ success: false, data: error.message });
+  }
 };
 
 exports.deleteAuthor = async (req, res) => {
   try {
     const id = req.params.id;
     const response = await Author.delete(id);
-    res.json({ success: true });
+    res.json({ success: true, data: response });
   } catch (err) {
-    res.json({ success: false });
+    res.json({ success: false, data: response });
   }
 };

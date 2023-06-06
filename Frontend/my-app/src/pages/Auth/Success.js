@@ -5,10 +5,12 @@ import { useContext } from "react";
 import { loggedInContext } from "../../App";
 import axios from "axios";
 import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 
 const Success = () => {
   const { auth, setIsLoggedIn } = useContext(loggedInContext);
   const { token } = useQueryParam("token");
+  console.log("token", token);
   let navigate = useNavigate();
   useEffect(() => {
     if (!token) {
@@ -20,11 +22,14 @@ const Success = () => {
 
   const validateToken = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/validateToken", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `${process.env.REACT_APP_ServerUrl}/validateToken`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       console.log(response);
 
       if (response.data.success) {
@@ -37,7 +42,19 @@ const Success = () => {
     }
   };
 
-  return <CircularProgress />;
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
+        height: "100vh",
+      }}
+    >
+      <CircularProgress />
+    </Box>
+  );
 };
 
 export default Success;
