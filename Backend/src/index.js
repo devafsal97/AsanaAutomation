@@ -50,14 +50,14 @@ app.use(express.json());
 app.use(cors());
 
 app.get(
-  "/google",
+  "/api/google",
   passport.authenticate("google", {
     scope: ["email", "profile"],
   })
 );
 
 app.get(
-  "/google/callback",
+  "/api/google/callback",
   passport.authenticate("google", {
     failureRedirect: "/failed",
     session: false,
@@ -76,17 +76,17 @@ app.get("/failed", (req, res) => {
   res.send("Failed");
 });
 
-app.get("/validateToken", requireAuth([roles.USER]), (req, res) => {
+app.get("/api/validateToken", requireAuth([roles.USER]), (req, res) => {
   res.json({ success: true, user: req.currentUser });
 });
 
-app.use("/webhook", webhookRoutes);
-app.use("/twilio", twilioRoutes);
-app.use("/users", userRoutes);
-app.use("/tasks", taskRoutes);
-app.use("/authors", authorRoutes);
-app.use("/escalation", escalationRoutes);
-app.use("/comments", commentsRoutes);
+app.use("/api/webhook", webhookRoutes);
+app.use("/api/twilio", twilioRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/tasks", taskRoutes);
+app.use("/api/authors", authorRoutes);
+app.use("/api/escalation", escalationRoutes);
+app.use("/api/comments", commentsRoutes);
 
 const server = app.listen(8000, () => {
   console.log("listening to port", server.address());
