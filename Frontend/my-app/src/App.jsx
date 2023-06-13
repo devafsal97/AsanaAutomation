@@ -25,6 +25,7 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    console.log("token", token);
     if (token) {
       isTokenValid();
     } else {
@@ -41,6 +42,7 @@ function App() {
       const response = await axiosInstance.get(
         `${process.env.REACT_APP_ServerUrl}/validateToken`
       );
+      console.log("valid login in app js", response.data);
 
       if (response.data.success) {
         setIsLoggedIn({
@@ -83,9 +85,11 @@ function App() {
             <Route path="/users" element={withLayout(UserPage)} />
           </>
         ) : (
-          <Route path="/" element={<Login />} />
+          <>
+            <Route path="/auth/success" element={<AuthSuccess />} />
+            <Route path="/" element={<Login />} />
+          </>
         )}
-        <Route path="/auth/success" element={<AuthSuccess />} />
       </Routes>
     </loggedInContext.Provider>
   );

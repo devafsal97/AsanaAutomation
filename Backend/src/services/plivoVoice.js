@@ -2,6 +2,7 @@ const firestore = require("./firestoreCrud");
 const Escalation = require("../models/Escalation");
 const Task = require("../models/Task");
 const User = require("../models/User");
+const plivo = require("plivo");
 require("dotenv").config();
 
 exports.notifyCurrentAuthor = async (data, gid) => {
@@ -156,18 +157,25 @@ exports.updateCallStatus = async (
 };
 
 exports.generateCall = async (number, priority, gid) => {
-  const accountSid = process.env.TwilioAccounSid;
-  const authToken = process.env.TwilioAuthToken;
-  const client = require("twilio")(accountSid, authToken);
-
-  client.calls.create({
-    url: "http://demo.twilio.com/docs/voice.xml",
-    to: number,
-    from: "+16204559131",
-    statusCallback: `${process.env.ServerUrl}/twilio/status-callback?callPriority=${priority}&gid=${gid}`,
-    statusCallbackEvent: ["answered", "completed"],
-    statusCallbackMethod: "POST",
-  });
+  console.log("generate call reached");
+  var client = new plivo.Client("", "");
+  client.calls
+    .create(
+      "<caller_id>",
+      "+9180751766645",
+      "https://s3.amazonaws.com/static.plivo.com/answer.xml",
+      {
+        answerMethod: "GET",
+      }
+    )
+    .then(
+      function (response) {
+        console.log(response);
+      },
+      function (err) {
+        console.error(err);
+      }
+    );
 };
 
 const updateTaskDetails = async (taskId, data, priority) => {

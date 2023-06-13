@@ -34,7 +34,7 @@ exports.getAuthors = async (req, res) => {
     const response = await Author.getAll();
     res.json({ success: true, data: response });
   } catch (error) {
-    res.json({ success: false, data: error.message });
+    res.json({ success: false, error: error.message });
   }
 };
 

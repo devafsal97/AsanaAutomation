@@ -1,5 +1,5 @@
 const axios = require("axios");
-const twilio = require("../services/twiliocall");
+const plivo = require("../services/plivoVoice");
 const firebase = require("../services/firestoreCrud");
 const Author = require("../models/Author");
 const User = require("../models/User");
@@ -53,7 +53,7 @@ exports.create_task_emer_post = async (req, res) => {
       if (calculatedSignature === xHookSignature) {
         console.log("valid signature");
         res.sendStatus(200);
-        console.log("evenst", req.body.events);
+        console.log("evenst", req.body.events[0].change.new_value.gid);
         if (!!req.body.events.length) {
           if (
             req.body.events[0].change.new_value.gid ===
@@ -71,7 +71,7 @@ exports.create_task_emer_post = async (req, res) => {
               timingStatus.display_value === "Emergency" ||
               timingStatus.display_value === "Exception"
             ) {
-              startTimer(taskId);
+              // startTimer(taskId);
 
               const authors = await Author.getAll();
               const authorArray = authors.filter((author) => {
@@ -112,7 +112,7 @@ exports.create_task_emer_post = async (req, res) => {
 
                 await task.save();
 
-                await twilio.notifyCurrentAuthor(
+                await plivo.notifyCurrentAuthor(
                   currentAuthor.phoneNumber,
                   taskId
                 );

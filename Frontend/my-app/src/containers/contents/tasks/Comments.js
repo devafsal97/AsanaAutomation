@@ -52,7 +52,7 @@ const Comments = ({ open, closeDrawer, commentToastHandler }) => {
   };
 
   const updateComment = async (data) => {
-    const url = `http://localhost:8000/comments`;
+    const url = `${process.env.REACT_APP_ServerUrl}/comments`;
     const response = await axiosInstance.put(url, data);
     if (response.data.success) {
       commentToastHandler();

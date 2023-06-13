@@ -8,8 +8,8 @@ exports.configureGoogleStrategy = () => {
   passport.use(
     new GoogleStrategy(
       {
-        clientID: process.env.GoogleAuthClientId,
-        clientSecret: process.env.GoogleAuthClientSecret,
+        clientID: "",
+        clientSecret: "",
         callbackURL: `http://localhost:8000/api/google/callback`,
         passReqToCallback: true,
       },

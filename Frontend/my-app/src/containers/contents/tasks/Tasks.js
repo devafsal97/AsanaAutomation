@@ -9,6 +9,8 @@ import SearchComponent from "components/Search/SearchComponent";
 import DateRangePicker from "components/Date/DateRangePicker";
 import Toast from "components/Toast/Toast";
 import Comments from "./Comments";
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 
 const Tasks = () => {
   const [tasks, setTasks] = useState([]);
@@ -191,19 +193,34 @@ const Tasks = () => {
             onEnterHandler={onEnterHandler}
           />
         </div>
-        <DataTable taskList={tasks} handleTaskClick={handleTaskClick} />
-        <div className="button-container">
-          <IconLabelButtons
-            text="Previous Page"
-            onClick={onPrevClickHandler}
-            disabled={currentPage === 1}
-          ></IconLabelButtons>
-          <IconLabelButtons
-            text="Next Page"
-            onClick={onNextClickHandler}
-            disabled={tasks.length < 8}
-          ></IconLabelButtons>
-        </div>
+        {!tasks.length ? (
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        ) : (
+          <>
+            <DataTable taskList={tasks} handleTaskClick={handleTaskClick} />
+            <div className="button-container">
+              <IconLabelButtons
+                text="Previous Page"
+                onClick={onPrevClickHandler}
+                disabled={currentPage === 1}
+              />
+              <IconLabelButtons
+                text="Next Page"
+                onClick={onNextClickHandler}
+                disabled={tasks.length < 8}
+              />
+            </div>
+          </>
+        )}
       </div>
     </>
   );

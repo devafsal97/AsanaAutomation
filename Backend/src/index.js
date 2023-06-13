@@ -69,7 +69,7 @@ app.get(
       },
       process.env.JWTSecretKey
     );
-    res.redirect(`${process.env.FrontEndUrl}/auth/success?token=${token}`);
+    res.redirect(`${process.env.FrontEndUrl}/#/auth/success?token=${token}`);
   }
 );
 app.get("/failed", (req, res) => {
@@ -81,7 +81,7 @@ app.get("/api/validateToken", requireAuth([roles.USER]), (req, res) => {
 });
 
 app.use("/api/webhook", webhookRoutes);
-app.use("/api/twilio", twilioRoutes);
+app.use("/api/plivo", twilioRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/authors", authorRoutes);
