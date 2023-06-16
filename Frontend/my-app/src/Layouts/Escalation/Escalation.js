@@ -55,6 +55,7 @@ const Escalation = () => {
     const response = await axiosInstance.get(url);
     if (response.data.success) {
       setEscalation(response.data.data);
+      console.log("escalation", response.data.data);
     } else {
       setEscalation([]);
     }
@@ -66,6 +67,7 @@ const Escalation = () => {
     const response = await axiosInstance.get(url);
     if (response.data.success) {
       setUsers(response.data.data);
+      console.log("uesrs", response.data.data);
     } else {
       setUsers([]);
     }
@@ -85,6 +87,7 @@ const Escalation = () => {
         severity={severity}
         closeHandler={toastCloseHandler}
       ></Toast>
+      {console.log(usersById)}
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         {!!escalation.length &&
           !!users.length &&

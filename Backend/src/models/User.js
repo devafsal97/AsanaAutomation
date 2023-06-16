@@ -50,12 +50,14 @@ class User {
         id: doc.id,
         ...doc.data(),
       }));
+      console.log("usersd data", usersData);
       return usersData;
     } else {
       throw new Error("no users available");
     }
   }
   static async findUserByEmail(email) {
+    console.log("email", email);
     const userDoc = await firestore.db
       .collection("Users")
       .where("email", "==", email)

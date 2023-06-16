@@ -71,7 +71,7 @@ exports.create_task_emer_post = async (req, res) => {
               timingStatus.display_value === "Emergency" ||
               timingStatus.display_value === "Exception"
             ) {
-              // startTimer(taskId);
+              startTimer(taskId);
 
               const authors = await Author.getAll();
               const authorArray = authors.filter((author) => {
@@ -206,17 +206,18 @@ const functionAfter2Minutes = async (taskId) => {
   getTaskDetails(taskId).then(async (taskDetails) => {
     const section = taskDetails.data.memberships[0].section.name;
     if (section != "In Progress") {
-      // await twilio.escalationCallDefiner(taskDetails.data.gid);
+      await plivo.escalationCallDefiner(taskDetails.data.gid);
     }
   });
 };
 
 const functionAfter15Minutes = async (taskId) => {
+  console.log("functin after 15 min cllaed");
   const taskDetails = await getTaskDetails(taskId);
   const section = taskDetails.data.memberships[0].section.name;
   if (section != "Published" && section == "In Progress") {
     const comment = await Comment.getByName("Comment On Delay");
-    // await addComment(taskId, comment.comment);
+    await addComment(taskId, comment.comment);
   }
 };
 

@@ -3,6 +3,7 @@ const Escalation = require("../models/Escalation");
 const Task = require("../models/Task");
 const User = require("../models/User");
 const plivo = require("plivo");
+const moment = require("moment");
 require("dotenv").config();
 
 exports.notifyCurrentAuthor = async (data, gid) => {
@@ -12,9 +13,7 @@ exports.notifyCurrentAuthor = async (data, gid) => {
 
 exports.escalationCallDefiner = async (gid) => {
   const data = await Escalation.getAll();
-  console.log("data", data);
   const initialContactData = data.filter((item) => item.priority == "Initial");
-  console.log("initia ata", initialContactData);
   const initialContactUser = await User.findById(initialContactData[0].userId);
   const phoneNumber = initialContactUser.phoneNumber;
   await this.generateCall(phoneNumber, "firstCall", gid);
@@ -33,15 +32,16 @@ exports.updateCallStatus = async (
     callPriorityparam == "firstCall"
   ) {
     console.log(
+      "first call status",
       phoneNumber,
       callStatusParams.CallStatus,
       callPriorityparam,
       gid
     );
     const escalationdata = {
-      number: callStatusParams.Called,
+      number: callStatusParams.To,
       callStatus: callStatusParams.CallStatus,
-      timeStamp: callStatusParams.Timestamp,
+      timeStamp: moment().format("YYYY-MM-DD HH:mm:ss").toString(),
     };
     await updateTaskDetails(gid, escalationdata, "firstCall");
     const secondayContactData = data.filter(
@@ -56,9 +56,9 @@ exports.updateCallStatus = async (
     callPriorityparam == "firstCall"
   ) {
     const escalationdata = {
-      number: callStatusParams.Called,
+      number: callStatusParams.To,
       callStatus: "Answered",
-      timeStamp: callStatusParams.Timestamp,
+      timeStamp: moment().format("YYYY-MM-DD HH:mm:ss").toString(),
     };
     await updateTaskDetails(gid, escalationdata, "firstCall");
   }
@@ -68,15 +68,16 @@ exports.updateCallStatus = async (
     callPriorityparam == "secondCall"
   ) {
     console.log(
+      "second call status",
       phoneNumber,
       callStatusParams.CallStatus,
       callPriorityparam,
       gid
     );
     const escalationdata = {
-      number: callStatusParams.Called,
+      number: callStatusParams.To,
       callStatus: callStatusParams.CallStatus,
-      timeStamp: callStatusParams.Timestamp,
+      timeStamp: moment().format("YYYY-MM-DD HH:mm:ss").toString(),
     };
     await updateTaskDetails(gid, escalationdata, "secondCall");
     const tertiaryContactData = data.filter(
@@ -91,9 +92,9 @@ exports.updateCallStatus = async (
     callPriorityparam == "secondCall"
   ) {
     const escalationdata = {
-      number: callStatusParams.Called,
+      number: callStatusParams.To,
       callStatus: "Answered",
-      timeStamp: callStatusParams.Timestamp,
+      timeStamp: moment().format("YYYY-MM-DD HH:mm:ss").toString(),
     };
     await updateTaskDetails(gid, escalationdata, "secondCall");
   }
@@ -103,15 +104,16 @@ exports.updateCallStatus = async (
     callPriorityparam == "thirdCall"
   ) {
     console.log(
+      "third call status",
       phoneNumber,
       callStatusParams.CallStatus,
       callPriorityparam,
       gid
     );
     const escalationdata = {
-      number: callStatusParams.Called,
+      number: callStatusParams.To,
       callStatus: callStatusParams.CallStatus,
-      timeStamp: callStatusParams.Timestamp,
+      timeStamp: moment().format("YYYY-MM-DD HH:mm:ss").toString(),
     };
     await updateTaskDetails(gid, escalationdata, "thirdCall");
   } else if (
@@ -119,9 +121,9 @@ exports.updateCallStatus = async (
     callPriorityparam == "thirdCall"
   ) {
     const escalationdata = {
-      number: callStatusParams.Called,
+      number: callStatusParams.To,
       callStatus: "Answered",
-      timeStamp: callStatusParams.Timestamp,
+      timeStamp: moment().format("YYYY-MM-DD HH:mm:ss").toString(),
     };
     await updateTaskDetails(gid, escalationdata, "thirdCall");
   }
@@ -137,9 +139,9 @@ exports.updateCallStatus = async (
       gid
     );
     const escalationdata = {
-      number: callStatusParams.Called,
+      number: callStatusParams.To,
       callStatus: callStatusParams.CallStatus,
-      timeStamp: callStatusParams.Timestamp,
+      timeStamp: moment().format("YYYY-MM-DD HH:mm:ss").toString(),
     };
 
     await updateTaskDetails(gid, escalationdata, "standard");
@@ -148,48 +150,43 @@ exports.updateCallStatus = async (
     callPriorityparam == "standard"
   ) {
     const escalationdata = {
-      number: callStatusParams.Called,
+      number: callStatusParams.To,
       callStatus: "Answered",
-      timeStamp: callStatusParams.Timestamp,
+      timeStamp: moment().format("YYYY-MM-DD HH:mm:ss").toString(),
     };
     await updateTaskDetails(gid, escalationdata, "standard");
   }
 };
 
 exports.generateCall = async (number, priority, gid) => {
-  console.log("generate call reached");
-  var client = new plivo.Client("", "");
-  client.calls
-    .create(
-      "<caller_id>",
-      "+9180751766645",
-      "https://s3.amazonaws.com/static.plivo.com/answer.xml",
-      {
-        answerMethod: "GET",
-      }
-    )
-    .then(
-      function (response) {
-        console.log(response);
-      },
-      function (err) {
-        console.error(err);
-      }
-    );
+  console.log("generate call reached", number);
+  var client = new plivo.Client(
+    process.env.PlivoAuthId,
+    process.env.PlivoAuthToken
+  );
+  client.calls.create(
+    "+19702872487",
+    `+91${number}`,
+    `${process.env.ServerUrl}/api/plivo/answer-url?callPriority=${priority}&gid=${gid}`,
+    {
+      answerMethod: "POST",
+    }
+  );
 };
 
 const updateTaskDetails = async (taskId, data, priority) => {
-  console.log("data", data);
   const task = await Task.getByGid(taskId);
-  console.log("task detais", task);
   if (priority == "standard") {
     const updatedTask = { ...task, authorCallStatus: data };
-    console.log("updated task", updatedTask);
     await Task.update(updatedTask);
   } else {
     const escalationData = task.escalationProcess;
-    escalationData.push(data);
-    const updatedTask = { ...task, escalationProcess: escalationData };
-    await Task.update(updatedTask);
+    const object = escalationData.find((item) => item["priority"] === priority);
+    if (!object) {
+      console.log("no object");
+      escalationData.push(data);
+      const updatedTask = { ...task, escalationProcess: escalationData };
+      await Task.update(updatedTask);
+    }
   }
 };

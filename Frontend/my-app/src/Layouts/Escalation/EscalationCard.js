@@ -20,8 +20,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import axiosInstance from "utils/axiosinstance";
 import { loggedInContext } from "App";
 
-import { async } from "q";
-
 const EscalationCard = ({
   userData,
   escalationData,
@@ -36,6 +34,7 @@ const EscalationCard = ({
     email: "",
     phoneNumber: "",
   };
+  console.log("users data", userData);
 
   const { auth, setIsLoggedIn } = useContext(loggedInContext);
 
