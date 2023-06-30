@@ -53,3 +53,30 @@ exports.getByDate = async (req, res) => {
     res.json({ success: false, error: error.message });
   }
 };
+
+exports.getTaskAnalytics = async (req, res) => {
+  try {
+    const response = await Task.getInprogressTaskCount();
+    res.json({ success: true, data: response });
+  } catch (error) {
+    res.json({ success: false, error: error });
+  }
+};
+
+exports.getNewTaskData = async (req, res) => {
+  try {
+    const response = await Task.getNewTaskData();
+    res.json({ success: true, data: response });
+  } catch (error) {
+    res.json({ success: false, error: error });
+  }
+};
+
+exports.getActiveTask = async (req, res) => {
+  try {
+    const response = await Task.getActiveTask();
+    res.json({ success: true, data: response });
+  } catch (error) {
+    res.json({ success: false, error: error });
+  }
+};

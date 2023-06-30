@@ -12,6 +12,7 @@ exports.configureJwtStrategy = () => {
 
   passport.use(
     new Strategy(opts, async function (payload, done) {
+      console.log("uerid", payload.id);
       const user = await User.findById(payload.id);
       if (user) {
         return done(null, user);

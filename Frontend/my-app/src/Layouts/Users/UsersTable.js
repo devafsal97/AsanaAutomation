@@ -1,3 +1,4 @@
+import "./UsersTable.css";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -19,12 +20,13 @@ export default function UsersTable({ onClickEdit, users }) {
       <Table aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell align="center">Email</TableCell>
-            <TableCell align="center">PhoneNumber</TableCell>
-            <TableCell align="center">role</TableCell>
+            <TableCell>USER</TableCell>
+
+            <TableCell>FUNCTION</TableCell>
+            <TableCell>PHONE NUMBER</TableCell>
+
             {auth.currentUser.role == "admin" && (
-              <TableCell align="center">Edit</TableCell>
+              <TableCell align="center">ACTION</TableCell>
             )}
           </TableRow>
         </TableHead>
@@ -35,15 +37,35 @@ export default function UsersTable({ onClickEdit, users }) {
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
               {console.log("user data", user)}
-              <TableCell>{user.name}</TableCell>
-              <TableCell align="center">{user.email}</TableCell>
-              <TableCell align="center">{user.phoneNumber}</TableCell>
-              <TableCell align="center">{user.role}</TableCell>
+              <TableCell>
+                <div className="userWrapper">
+                  <div className="userImage">
+                    <img src="https://drive.google.com/uc?export=view&id=1ZkOLli7mU4-Qh9qu38qKImV-qknbUBnQ" />
+                  </div>
+                  <div className="userDetails">
+                    <b>
+                      <span className="userName">{user.name}</span>
+                    </b>
+                    <br />
+                    <span className="userSubDetails">{user.email}</span>
+                  </div>
+                </div>
+              </TableCell>
+
+              <TableCell sx={{ textTransform: "capitalize" }}>
+                <b>{user.role}</b>
+                <br />
+                <span className="userSubDetails">ABC.com</span>
+              </TableCell>
+              <TableCell>{user.phoneNumber}</TableCell>
+
               {auth.currentUser.role == "admin" && (
-                <TableCell align="center" onClick={() => onClickEdit(user)}>
-                  <IconButton>
-                    <EditIcon />
-                  </IconButton>
+                <TableCell
+                  align="center"
+                  className="editCell"
+                  onClick={() => onClickEdit(user)}
+                >
+                  Edit
                 </TableCell>
               )}
             </TableRow>

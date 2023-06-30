@@ -63,7 +63,6 @@ const AuthorForm = ({ isOpen, toggleDrawer, addAuthorHandler }) => {
   };
 
   useEffect(() => {
-    console.log("useeffect called");
     getUsers();
   }, []);
 

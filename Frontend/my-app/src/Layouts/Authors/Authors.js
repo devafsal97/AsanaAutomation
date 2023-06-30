@@ -47,9 +47,7 @@ const Authors = () => {
     let url = `${process.env.REACT_APP_ServerUrl}/authors`;
     const response = await axiosInstance.get(url);
     if (response.data.success) {
-      console.log(response.data.data);
       setAuthors(response.data.data);
-      console.log("authors from authors", authors);
     } else {
       setAuthors([]);
     }
@@ -57,17 +55,13 @@ const Authors = () => {
 
   const getUsers = async () => {
     let url = `${process.env.REACT_APP_ServerUrl}/users`;
-    console.log("url", url);
     const response = await axiosInstance.get(url);
     if (response.data.success) {
-      console.log("users", response.data.data);
       setUsers(response.data.data);
-      console.log("Users from authors", users);
     }
   };
 
   const addAuthorHandler = async (data) => {
-    console.log("data", data);
     const response = await axiosInstance.post(
       `${process.env.REACT_APP_ServerUrl}/authors/`,
       data
@@ -99,19 +93,19 @@ const Authors = () => {
         addAuthorHandler={addAuthorHandler}
       />
 
-      {authors.length < 2 && auth.currentUser.role === "admin" && (
-        <Box
-          sx={{ display: "flex", justifyContent: "end", marginBottom: "10px" }}
+      {/* {authors.length < 2 && auth.currentUser.role === "admin" && ( */}
+      <Box
+        sx={{ display: "flex", justifyContent: "end", marginBottom: "10px" }}
+      >
+        <Button
+          onClick={toggleDrawer}
+          variant="contained"
+          endIcon={<PersonAddAlt1Icon />}
         >
-          <Button
-            onClick={toggleDrawer}
-            variant="contained"
-            endIcon={<PersonAddAlt1Icon />}
-          >
-            Add Author
-          </Button>
-        </Box>
-      )}
+          Add Author
+        </Button>
+      </Box>
+      {/* )} */}
 
       <AuthorTable
         onClickDeleteHandler={onClickDeleteHandler}

@@ -14,6 +14,7 @@ import Homepage from "pages/HomePage/Homepage";
 import AuthorPage from "pages/AuthorPage/AuthorPage";
 import EscalationPage from "pages/EscalationPage/EscalationPage";
 import UserPage from "pages/UserPage/UserPage";
+import OverViewPage from "pages/OverviewPage/OverViewPage";
 export const loggedInContext = createContext();
 
 function App() {
@@ -25,7 +26,6 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    console.log("token", token);
     if (token) {
       isTokenValid();
     } else {
@@ -42,17 +42,14 @@ function App() {
       const response = await axiosInstance.get(
         `${process.env.REACT_APP_ServerUrl}/validateToken`
       );
-      console.log("valid login in app js", response.data);
 
       if (response.data.success) {
         setIsLoggedIn({
           isLoggedIn: true,
           currentUser: response.data.user,
         });
-        console.log("logged user", response.data.user);
       }
     } catch (error) {
-      console.log("Error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -64,7 +61,6 @@ function App() {
         <CircularProgress />
       </div>
     );
-  console.log("isLoggedIn", auth.isLoggedIn);
 
   const withLayout = (component) => {
     const Compenent = component;
@@ -79,15 +75,16 @@ function App() {
       <Routes>
         {auth.isLoggedIn ? (
           <>
-            <Route path="/" element={withLayout(Homepage)} />
+            <Route path="/" element={withLayout(OverViewPage)} />
             <Route path="/authors" element={withLayout(AuthorPage)} />
             <Route path="/escalation" element={withLayout(EscalationPage)} />
             <Route path="/users" element={withLayout(UserPage)} />
+            <Route path="/tasks" element={withLayout(Homepage)} />
           </>
         ) : (
           <>
-            <Route path="/auth/success" element={<AuthSuccess />} />
             <Route path="/" element={<Login />} />
+            <Route path="/auth/success" element={<AuthSuccess />} />
           </>
         )}
       </Routes>

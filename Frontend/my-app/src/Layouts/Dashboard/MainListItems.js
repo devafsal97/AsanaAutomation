@@ -6,6 +6,7 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import ContactEmergencyIcon from "@mui/icons-material/ContactEmergency";
 import LaptopChromebookIcon from "@mui/icons-material/LaptopChromebook";
+import GroupIcon from "@mui/icons-material/Group";
 import { NavLink, Link } from "react-router-dom";
 
 import "./dashboard.css";
@@ -14,6 +15,12 @@ const MainListItems = () => {
   return (
     <div className="main-menu">
       <ListItemButton component={NavLink} to="/">
+        <ListItemIcon>
+          <DashboardIcon />
+        </ListItemIcon>
+        <ListItemText primary="Overview" />
+      </ListItemButton>
+      <ListItemButton component={NavLink} to="/tasks">
         <ListItemIcon>
           <AssignmentIcon />
         </ListItemIcon>
@@ -33,7 +40,7 @@ const MainListItems = () => {
       </ListItemButton>
       <ListItemButton component={NavLink} to="/users">
         <ListItemIcon>
-          <DashboardIcon />
+          <GroupIcon />
         </ListItemIcon>
         <ListItemText primary="Users" />
       </ListItemButton>

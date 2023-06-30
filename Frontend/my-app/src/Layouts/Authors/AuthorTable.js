@@ -18,7 +18,6 @@ export default function AuthorTable({ onClickDeleteHandler, authors, users }) {
   const [currentPage, setCurrentPage] = useState(1);
 
   const deleteAuthor = async (id) => {
-    console.log(id);
     let url = `${process.env.REACT_APP_ServerUrl}/authors/${id}`;
     const response = await axiosInstance.delete(url);
     if (response.data.success) {
@@ -56,7 +55,6 @@ export default function AuthorTable({ onClickDeleteHandler, authors, users }) {
                 key={author.id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
-                {console.log(author.id)}
                 <TableCell>{usersById[author.userId].name}</TableCell>
                 <TableCell align="center">{author.startTime}</TableCell>
                 <TableCell align="center">{author.endTime}</TableCell>

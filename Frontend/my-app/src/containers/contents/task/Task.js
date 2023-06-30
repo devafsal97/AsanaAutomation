@@ -7,10 +7,7 @@ import Divider from "@mui/material/Divider";
 import Link from "@mui/material/Link";
 
 const Task = ({ open, closeDrawer, selectedTask }) => {
-  console.log("selected tas", selectedTask);
-
   const convertTime = (time) => {
-    console.log("time", time);
     const timestamp = new firebase.firestore.Timestamp(
       time._seconds,
       time._nanoseconds
@@ -45,7 +42,6 @@ const Task = ({ open, closeDrawer, selectedTask }) => {
 
   return (
     <Drawer isOpen={open} onClose={closeDrawer} title="Task">
-      {console.log("stask".selectedTask)}
       <Box
         sx={{
           display: "flex",

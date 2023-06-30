@@ -25,20 +25,25 @@ const Users = () => {
 
   const getUsers = async () => {
     let url = `${process.env.REACT_APP_ServerUrl}/users`;
-    console.log("url", url);
     const response = await axiosInstance.get(url);
-    console.log("users", response.data.data);
     setUsers(response.data.data);
   };
 
   const toggleDrawer = () => {
+    console.log();
+    if (drawerOpen) {
+      console.log("drawer closedcalled");
+      setUser(null);
+    }
     setDrawerOpen(!drawerOpen);
-    if (user) setUser(null);
   };
 
   const onClickEditUser = (user) => {
+    console.log("user from edit", user);
     setUser(user);
-    toggleDrawer();
+    if (user) {
+      toggleDrawer();
+    }
   };
 
   const toastCloseHandler = () => {
@@ -57,6 +62,7 @@ const Users = () => {
   };
 
   const addUserHandler = async (data) => {
+    console.log("user", user);
     if (user) {
       const response = await axiosInstance.put(
         `${process.env.REACT_APP_ServerUrl}/users/${user.id}`,
@@ -69,8 +75,10 @@ const Users = () => {
           }
           return user;
         });
-        setDrawerOpen(false);
+        toggleDrawer();
+        setUser(null);
         setUsers(updatedData);
+        setSeverity("success");
         setToastMessage("user updated successfully");
         setToastOpen(true);
       } else {
@@ -84,8 +92,9 @@ const Users = () => {
         data
       );
       if (response.data.success) {
-        setDrawerOpen(false);
+        toggleDrawer();
         setUsers((previousValue) => [response.data.data, ...previousValue]);
+        setSeverity("success");
         setToastMessage("user added successfully");
         setToastOpen(true);
       } else {

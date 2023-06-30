@@ -17,7 +17,10 @@ const escalationRoutes = require("./routes/escalationRoute");
 const commentsRoutes = require("./routes/commentRoutes");
 const webhookRoutes = require("./routes/webhookRoutes");
 const twilioRoutes = require("./routes/twilioRoutes");
+
 require("dotenv").config();
+
+app.use(cors());
 
 app.use(
   session({
@@ -46,8 +49,6 @@ app.use(
   })
 );
 app.use(express.json());
-
-app.use(cors());
 
 app.get(
   "/api/google",

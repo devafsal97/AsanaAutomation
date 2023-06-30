@@ -92,7 +92,7 @@ const Dashboard = ({ children }) => {
             noWrap
             sx={{ flexGrow: 1 }}
           >
-            Dashboard
+            WorkFlow+
           </Typography>
           <div>
             <IconButton
@@ -182,11 +182,11 @@ const Dashboard = ({ children }) => {
                 marginLeft: "auto",
                 color: "#2076D2",
                 fontWeight: "Bold",
-                letterSpacing: "4px",
+                letterSpacing: "2px",
               }}
               variant="h5"
             >
-              AUKI
+              ABC.com
             </Typography>
           )}
           <IconButton sx={{ marginLeft: "auto" }} onClick={toggleDrawer}>

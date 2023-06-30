@@ -28,13 +28,21 @@ const EscalationCard = ({
 }) => {
   const [edit, setEditMode] = useState(false);
   //const [selectedUser, setSelectedUser] = useState(null);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
 
   const data = {
     userId: "",
     email: "",
     phoneNumber: "",
   };
-  console.log("users data", userData);
 
   const { auth, setIsLoggedIn } = useContext(loggedInContext);
 
@@ -49,7 +57,6 @@ const EscalationCard = ({
   const onSelectedHandler = async (event, formik) => {
     const id = event.target.value;
     const selectedUser = users.find((user) => user.id === id);
-    console.log("selectedUSer", selectedUser);
     await formik.setFieldValue("userId", selectedUser.id);
     await formik.setFieldValue("email", selectedUser.email);
     await formik.setFieldValue("phoneNumber", selectedUser.phoneNumber);
@@ -61,7 +68,15 @@ const EscalationCard = ({
   };
 
   return (
-    <Card sx={{ width: "25%" }}>
+    <Card
+      sx={{
+        width: "25%",
+        transition: "transform 0.3s",
+        transform: isHovered ? "translateY(-10px)" : "none",
+      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <Box
         sx={{
           display: "flex",
@@ -96,10 +111,10 @@ const EscalationCard = ({
             justifyContent: "center",
             width: "100%",
           }}
-        >
-          <Typography variant="subtitle2">priority</Typography>
-        </Box>
-        <Typography variant="h4">{escalationData.priority}</Typography>
+        ></Box>
+        <Typography sx={{ marginTop: "20px" }} variant="h6">
+          {escalationData.priority} Contact
+        </Typography>
 
         {edit ? (
           <Formik
@@ -119,13 +134,11 @@ const EscalationCard = ({
                 userId: values.userId,
                 priority: escalationData.priority,
               });
-              console.log("values", values);
               setEditMode(false);
             }}
           >
             {(formik) => (
               <Form>
-                {console.log({ formik })}
                 <FormControl fullWidth>
                   <InputLabel id="demo-simple-select-label">name</InputLabel>
                   <Select
@@ -227,10 +240,7 @@ const EscalationCard = ({
                 alignItems: "center",
               }}
             >
-              <Typography
-                variant="h6"
-                sx={{ marginRight: "20px", width: "50px" }}
-              >
+              <Typography sx={{ marginRight: "20px", width: "50px" }}>
                 Name:
               </Typography>
               <Typography>{userData.name}</Typography>
@@ -242,10 +252,7 @@ const EscalationCard = ({
                 alignItems: "center",
               }}
             >
-              <Typography
-                variant="h6"
-                sx={{ marginRight: "20px", width: "50px" }}
-              >
+              <Typography sx={{ marginRight: "20px", width: "50px" }}>
                 Email:
               </Typography>
               <Typography>{userData.email}</Typography>
@@ -257,10 +264,7 @@ const EscalationCard = ({
                 alignItems: "center",
               }}
             >
-              <Typography
-                variant="h6"
-                sx={{ marginRight: "20px", width: "50px" }}
-              >
+              <Typography sx={{ marginRight: "20px", width: "50px" }}>
                 Phone:
               </Typography>
               <Typography>{userData.phoneNumber}</Typography>

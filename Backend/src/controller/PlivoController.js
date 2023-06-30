@@ -9,5 +9,23 @@ exports.answerUrl = async (req, res) => {
   const gid = req.query.gid;
   const phoneNumber = req.body.To;
 
-  plivo.updateCallStatus(phoneNumber, req.body, callPriority, gid);
+  await plivo.updateCallStatus(phoneNumber, req.body, callPriority, gid);
+  const xmlResponse = `
+    <Response>
+      <Speak>new emergency task created with id ${gid}</Speak>
+    </Response>
+  `;
+
+  res.set("Content-Type", "text/xml");
+  res.status(200).send(xmlResponse);
+};
+
+exports.hangupUrl = async (req, res) => {
+  console.log("hangup url hitted", req.body);
+  res.status(200);
+};
+
+exports.fallbackUrl = async (req, res) => {
+  console.log("fallback hitted", req.body);
+  res.status(200);
 };

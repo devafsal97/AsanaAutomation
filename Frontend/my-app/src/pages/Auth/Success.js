@@ -8,10 +8,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 
 const Success = () => {
-  console.log("reached");
   const { auth, setIsLoggedIn } = useContext(loggedInContext);
   const { token } = useQueryParam("token");
-  console.log("token", token);
   let navigate = useNavigate();
   useEffect(() => {
     if (!token) {
@@ -22,7 +20,6 @@ const Success = () => {
   }, []);
 
   const validateToken = async () => {
-    console.log("valod token reached");
     try {
       const response = await axios.get(
         `${process.env.REACT_APP_ServerUrl}/validateToken`,
@@ -32,10 +29,8 @@ const Success = () => {
           },
         }
       );
-      console.log("response", response);
 
       if (response.data.success) {
-        console.log("token valid success");
         localStorage.setItem("token", token);
         setIsLoggedIn({ isLoggedIn: true, currentUser: response.data.user });
         navigate("/");

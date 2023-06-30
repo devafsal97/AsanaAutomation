@@ -16,7 +16,7 @@ exports.escalationCallDefiner = async (gid) => {
   const initialContactData = data.filter((item) => item.priority == "Initial");
   const initialContactUser = await User.findById(initialContactData[0].userId);
   const phoneNumber = initialContactUser.phoneNumber;
-  await this.generateCall(phoneNumber, "firstCall", gid);
+  await this.generateCall(phoneNumber, "Initial", gid);
 };
 
 exports.updateCallStatus = async (
@@ -29,7 +29,7 @@ exports.updateCallStatus = async (
   if (
     (callStatusParams.CallStatus == "no-answer" ||
       callStatusParams.CallStatus == "busy") &&
-    callPriorityparam == "firstCall"
+    callPriorityparam == "Initial"
   ) {
     console.log(
       "first call status",
@@ -43,29 +43,29 @@ exports.updateCallStatus = async (
       callStatus: callStatusParams.CallStatus,
       timeStamp: moment().format("YYYY-MM-DD HH:mm:ss").toString(),
     };
-    await updateTaskDetails(gid, escalationdata, "firstCall");
+    await updateTaskDetails(gid, escalationdata, "Initial");
     const secondayContactData = data.filter(
       (item) => item.priority == "Secondary"
     );
     const secondayContactUser = await User.findById(
       secondayContactData[0].userId
     );
-    await this.generateCall(secondayContactUser.phoneNumber, "secondCall", gid);
+    await this.generateCall(secondayContactUser.phoneNumber, "Secondary", gid);
   } else if (
     callStatusParams.CallStatus == "in-progress" &&
-    callPriorityparam == "firstCall"
+    callPriorityparam == "Initial"
   ) {
     const escalationdata = {
       number: callStatusParams.To,
       callStatus: "Answered",
       timeStamp: moment().format("YYYY-MM-DD HH:mm:ss").toString(),
     };
-    await updateTaskDetails(gid, escalationdata, "firstCall");
+    await updateTaskDetails(gid, escalationdata, "Initial");
   }
   if (
     (callStatusParams.CallStatus == "no-answer" ||
       callStatusParams.CallStatus == "busy") &&
-    callPriorityparam == "secondCall"
+    callPriorityparam == "Secondary"
   ) {
     console.log(
       "second call status",
@@ -79,29 +79,29 @@ exports.updateCallStatus = async (
       callStatus: callStatusParams.CallStatus,
       timeStamp: moment().format("YYYY-MM-DD HH:mm:ss").toString(),
     };
-    await updateTaskDetails(gid, escalationdata, "secondCall");
+    await updateTaskDetails(gid, escalationdata, "Secondary");
     const tertiaryContactData = data.filter(
       (item) => item.priority == "Tertiary"
     );
     const tertiaryContactUser = await User.findById(
       tertiaryContactData[0].userId
     );
-    await this.generateCall(tertiaryContactUser.phoneNumber, "thirdCall", gid);
+    await this.generateCall(tertiaryContactUser.phoneNumber, "Tertiary", gid);
   } else if (
     callStatusParams.CallStatus == "in-progress" &&
-    callPriorityparam == "secondCall"
+    callPriorityparam == "Secondary"
   ) {
     const escalationdata = {
       number: callStatusParams.To,
       callStatus: "Answered",
       timeStamp: moment().format("YYYY-MM-DD HH:mm:ss").toString(),
     };
-    await updateTaskDetails(gid, escalationdata, "secondCall");
+    await updateTaskDetails(gid, escalationdata, "Secondary");
   }
   if (
     (callStatusParams.CallStatus == "no-answer" ||
       callStatusParams.CallStatus == "busy") &&
-    callPriorityparam == "thirdCall"
+    callPriorityparam == "Tertiary"
   ) {
     console.log(
       "third call status",
@@ -115,17 +115,17 @@ exports.updateCallStatus = async (
       callStatus: callStatusParams.CallStatus,
       timeStamp: moment().format("YYYY-MM-DD HH:mm:ss").toString(),
     };
-    await updateTaskDetails(gid, escalationdata, "thirdCall");
+    await updateTaskDetails(gid, escalationdata, "Tertiary");
   } else if (
     callStatusParams.CallStatus === "in-progress" &&
-    callPriorityparam == "thirdCall"
+    callPriorityparam == "Tertiary"
   ) {
     const escalationdata = {
       number: callStatusParams.To,
       callStatus: "Answered",
       timeStamp: moment().format("YYYY-MM-DD HH:mm:ss").toString(),
     };
-    await updateTaskDetails(gid, escalationdata, "thirdCall");
+    await updateTaskDetails(gid, escalationdata, "Tertiary");
   }
   if (
     (callStatusParams.CallStatus == "no-answer" ||
@@ -159,14 +159,13 @@ exports.updateCallStatus = async (
 };
 
 exports.generateCall = async (number, priority, gid) => {
-  console.log("generate call reached", number);
   var client = new plivo.Client(
     process.env.PlivoAuthId,
     process.env.PlivoAuthToken
   );
   client.calls.create(
     "+19702872487",
-    `+91${number}`,
+    `+66${number}`,
     `${process.env.ServerUrl}/api/plivo/answer-url?callPriority=${priority}&gid=${gid}`,
     {
       answerMethod: "POST",
@@ -183,7 +182,6 @@ const updateTaskDetails = async (taskId, data, priority) => {
     const escalationData = task.escalationProcess;
     const object = escalationData.find((item) => item["priority"] === priority);
     if (!object) {
-      console.log("no object");
       escalationData.push(data);
       const updatedTask = { ...task, escalationProcess: escalationData };
       await Task.update(updatedTask);

@@ -116,6 +116,85 @@ class Task {
       return taskData;
     }
   }
+
+  static async getInprogressTaskCount() {
+    console.log("hitted");
+    const querySnapshotProgress = await firestore.db
+      .collection("Tasks")
+      .where("inProgressTime", ">", "")
+      .orderBy("inProgressTime")
+      .get();
+
+    let newData = querySnapshotProgress.docs.filter((item) => {
+      const newItem = item.data().completedTime == "";
+      return newItem;
+    });
+    console.log("newItem", newData.length);
+
+    const querySnapshot = await firestore.db.collection("Tasks").get();
+    let totalTurnaroundTime = 0;
+    let documentCount = 0;
+
+    const newTaskArray = querySnapshot.docs.filter((item) => {
+      const newItem =
+        item.data().inProgressTime == "" && item.data().completedTime == "";
+      return newItem;
+    });
+
+    const completedCountArray = querySnapshot.docs.filter((item) => {
+      const newItem = item.data().completedTime != "";
+      return newItem;
+    });
+    console.log("completedCountArray", completedCountArray.length);
+
+    querySnapshot.docs.forEach((doc) => {
+      const turnaroundTime = doc.data().turnArroundTime;
+      const minutes = parseInt(turnaroundTime.replace(/[^0-9]/g, ""));
+      console.log("tat", minutes);
+      if (minutes) {
+        totalTurnaroundTime += minutes;
+        documentCount++;
+      }
+    });
+    const averageTurnaroundTime = totalTurnaroundTime / documentCount;
+    console.log("datataaa", {
+      activeTask: newData.length,
+      averageTat: averageTurnaroundTime,
+      completedTask: completedCountArray.length,
+    });
+    return [
+      { title: "newTask", value: newTaskArray.length },
+      { title: "activeTask", value: newData.length },
+      { title: "averageTat", value: averageTurnaroundTime },
+      { title: "completedTask", value: completedCountArray.length },
+    ];
+  }
+
+  static async getNewTaskData() {
+    const querySnapshot = await firestore.db.collection("Tasks").get();
+    const newTaskArray = querySnapshot.docs.filter((item) => {
+      const newItem =
+        item.data().inProgressTime == "" && item.data().completedTime == "";
+      return newItem;
+    });
+    const data = newTaskArray.map((item) => item.data());
+    return data;
+  }
+  static async getActiveTask() {
+    const querySnapshotProgress = await firestore.db
+      .collection("Tasks")
+      .where("inProgressTime", ">", "")
+      .orderBy("inProgressTime")
+      .get();
+
+    let newData = querySnapshotProgress.docs.filter((item) => {
+      const newItem = item.data().completedTime == "";
+      return newItem;
+    });
+
+    const data = newData.map((item) => item.data());
+    return data;
+  }
 }
 
 module.exports = Task;

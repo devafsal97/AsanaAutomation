@@ -35,9 +35,8 @@ const UserForm = ({ isOpen, toggleDrawer, user = {}, addUserHandler }) => {
             .required("Required"),
           phoneNumber: Yup.string()
             .required()
-            .matches(/^[0-9]+$/, "Must be only digits")
-            .min(10, "Must be exactly 10 digits")
-            .max(510, "Must be exactly 10 digits"),
+            .matches(/^[0-9]+$/, "Must be only digits"),
+
           role: Yup.string().required("Required"),
         })}
         onSubmit={(values) => {

@@ -39,7 +39,6 @@ const Tasks = () => {
   };
 
   const onEnterHandler = (keyword) => {
-    console.log("from parent", keyword);
     setSearchKeyword(keyword);
     if (currentPage != 1) {
       setCurrentPage(1);
@@ -66,7 +65,6 @@ const Tasks = () => {
   };
 
   const getTasks = async () => {
-    console.log(searchKeyword);
     const limit = 8;
     const offset = (currentPage - 1) * limit;
 
@@ -74,8 +72,6 @@ const Tasks = () => {
     if (searchKeyword) {
       url = url.concat(`&keyword=${searchKeyword}`);
     }
-
-    console.log("url", url);
 
     const response = await axiosInstance.get(url);
     if (response.data.success) {

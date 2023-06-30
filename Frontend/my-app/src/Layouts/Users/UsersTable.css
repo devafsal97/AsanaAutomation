@@ -1,0 +1,22 @@
+.userWrapper {
+    display: flex;
+}
+
+.userImage img {
+    height: 50px;
+    padding-right: 1rem;
+
+}
+
+.userSubDetails {
+    color: rgb(87 90 93 / 63%);
+    font-size: 12px;
+}
+
+.editCell {
+    cursor: pointer;
+}
+
+.userName {
+    text-transform: capitalize;
+}
