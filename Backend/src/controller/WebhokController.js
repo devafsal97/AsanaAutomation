@@ -112,10 +112,10 @@ exports.create_task_emer_post = async (req, res) => {
 
                 await task.save();
 
-                // await plivo.notifyCurrentAuthor(
-                //   currentAuthor.phoneNumber,
-                //   taskId
-                // );
+                await plivo.notifyCurrentAuthor(
+                  currentAuthor.phoneNumber,
+                  taskId
+                );
               } else {
                 throw new Error("No author Found");
               }
@@ -206,7 +206,7 @@ const functionAfter2Minutes = async (taskId) => {
   getTaskDetails(taskId).then(async (taskDetails) => {
     const section = taskDetails.data.memberships[0].section.name;
     if (section != "In Progress") {
-      //await plivo.escalationCallDefiner(taskDetails.data.gid);
+      await plivo.escalationCallDefiner(taskDetails.data.gid);
     }
   });
 };
@@ -226,8 +226,8 @@ const startTimer = (taskId) => {
     functionAfter2Minutes(taskId);
     timerId = setTimeout(() => {
       functionAfter15Minutes(taskId);
-    }, 1 * 60 * 1000);
-  }, 0.5 * 60 * 1000);
+    }, 2 * 60 * 1000);
+  }, 2 * 60 * 1000);
 };
 
 const updateTaskProgress = async (taskId, status, date) => {

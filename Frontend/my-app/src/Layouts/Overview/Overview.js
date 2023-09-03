@@ -26,10 +26,10 @@ const Overview = () => {
   };
 
   const analyticsKeyObject = {
-    newTask: "New Task",
-    activeTask: "Active Task",
-    averageTat: "Average TurnArround Time",
-    completedTask: "Completed Task Count",
+    newTask: "New Tasks",
+    activeTask: "Active Tasks",
+    averageTat: "Average Turn Around Time(minutes)",
+    completedTask: "Completed Task",
   };
   const getNewTaskData = async () => {
     let url = `${process.env.REACT_APP_ServerUrl}/tasks/getNewTaskData`;

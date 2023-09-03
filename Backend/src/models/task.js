@@ -191,7 +191,6 @@ class Task {
       const newItem = item.data().completedTime == "";
       return newItem;
     });
-
     const data = newData.map((item) => item.data());
     return data;
   }

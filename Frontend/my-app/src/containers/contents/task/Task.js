@@ -1,13 +1,16 @@
+import React from "react";
 import Drawer from "components/Drawer";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
-import Divider from "@mui/material/Divider";
 import Link from "@mui/material/Link";
 
 const Task = ({ open, closeDrawer, selectedTask }) => {
+  console.log("selected task", selectedTask);
+
   const convertTime = (time) => {
+    console.log("time", time);
     const timestamp = new firebase.firestore.Timestamp(
       time._seconds,
       time._nanoseconds
@@ -32,163 +35,70 @@ const Task = ({ open, closeDrawer, selectedTask }) => {
     "Tertiary call Status:",
   ];
 
-  const boxStyle = {
+  // Custom styling for the boxes
+  const customBoxStyle = {
     display: "flex",
     flexDirection: "row",
     alignItems: "baseline",
-    marginBottom: "3px",
+    marginBottom: "15px",
+    fontSize: "14px",
   };
-  const titleStye = { width: "150px", fontWeight: "600" };
+
+  // Custom styling for the titles
+  const customTitleStyle = {
+    width: "150px",
+    fontWeight: "600",
+    marginRight: "15px",
+    fontSize: "14px",
+  };
+
+  // Custom styling for the wrapper box
+  const customWrapperBoxStyle = {
+    display: "flex",
+    flexDirection: "column",
+    padding: "10px",
+    border: "1px solid #E0E0E0",
+    borderRadius: "8px",
+    marginBottom: "20px",
+    fontSize: "14px",
+    width: "fit-content",
+    maxWidth: "650px",
+  };
+
+  const customValueStyle = {
+    fontSize: "14px",
+  };
+
+  const statusColors = {
+    "no-answer": "red",
+    Answered: "green",
+  };
 
   return (
-    <Drawer isOpen={open} onClose={closeDrawer} title="Task">
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          height: "100%",
-          position: "relative",
-        }}
-      >
-        <Box sx={boxStyle}>
-          <Typography variant="subtitle1" sx={titleStye}>
+    <Drawer isOpen={open} onClose={closeDrawer} title="Task Details">
+      <Box sx={{ ...customWrapperBoxStyle }}>
+        <Box sx={{ ...customBoxStyle }}>
+          <Typography variant="subtitle1" sx={{ ...customTitleStyle }}>
             Name:
           </Typography>
-          <Typography variant="subtitle1">{selectedTask.name}</Typography>
-        </Box>
-        <Divider />
-        <Box sx={boxStyle}>
-          <Typography variant="subtitle1" sx={titleStye}>
-            Gid:
-          </Typography>
-          <Typography variant="subtitle1">{selectedTask.gid}</Typography>
-        </Box>
-        <Divider />
-        <Box sx={boxStyle}>
-          <Typography variant="subtitle1" sx={titleStye}>
-            Created At:
-          </Typography>
-          <Typography variant="subtitle1">
-            {convertTime(selectedTask.createdAt)}
-          </Typography>
-        </Box>
-        <Divider />
-        <Box sx={boxStyle}>
-          <Typography variant="subtitle1" sx={titleStye}>
-            Author:
-          </Typography>
-          <Typography variant="subtitle1">{selectedTask.author}</Typography>
-        </Box>
-        <Divider />
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          <Typography variant="subtitle1" sx={titleStye}>
-            Author Call Status:
-          </Typography>
-          <Box sx={{ marginLeft: "150px" }}>
-            <Box sx={boxStyle}>
-              <Typography sx={{ marginRight: "15px" }} variant="subtitle1">
-                Call Status:
-              </Typography>
-              <Typography>
-                {selectedTask.authorCallStatus.callStatus}
-              </Typography>
-            </Box>
-            <Box sx={boxStyle}>
-              <Typography sx={{ marginRight: "15px" }} variant="subtitle1">
-                Time:
-              </Typography>
-              <Typography>{selectedTask.authorCallStatus.timeStamp}</Typography>
-            </Box>
-            <Box sx={boxStyle}>
-              <Typography sx={{ marginRight: "15px" }} variant="subtitle1">
-                number
-              </Typography>
-              <Typography>{selectedTask.authorCallStatus.number}</Typography>
-            </Box>
-          </Box>
-        </Box>
-        <Divider />
-        <Box sx={boxStyle}>
-          <Typography variant="subtitle1" sx={titleStye}>
-            Inprogress Time:
-          </Typography>
-          <Typography variant="subtitle1">
-            {selectedTask.inProgressTime}
-          </Typography>
-        </Box>
-        <Divider />
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          <Typography variant="subtitle1" sx={titleStye}>
-            Escalation Process:
-          </Typography>
-          <Box sx={{ marginLeft: "150px" }}>
-            {selectedTask.escalationProcess.map((item, index) => {
-              return (
-                <Box
-                  sx={{
-                    marginBottom: "10px",
-                    borderBottom: "1px solid #E0E0E0",
-                  }}
-                >
-                  <Box sx={boxStyle}>
-                    <Typography
-                      sx={{ marginRight: "15px" }}
-                      variant="subtitle1"
-                    >
-                      {callPriority[index]}
-                    </Typography>
-                    <Typography>{item.callStatus}</Typography>
-                  </Box>
-                  <Box sx={boxStyle}>
-                    <Typography
-                      sx={{ marginRight: "15px" }}
-                      variant="subtitle1"
-                    >
-                      Time:
-                    </Typography>
-                    <Typography>{item.timeStamp}</Typography>
-                  </Box>
-                  <Box sx={boxStyle}>
-                    <Typography
-                      sx={{ marginRight: "15px" }}
-                      variant="subtitle1"
-                    >
-                      number
-                    </Typography>
-                    <Typography>{item.number}</Typography>
-                  </Box>
-                </Box>
-              );
-            })}
-          </Box>
-        </Box>
-        <Divider />
-        <Box sx={boxStyle}>
-          <Typography variant="subtitle1" sx={titleStye}>
-            Completed Time:
-          </Typography>
-          <Typography variant="subtitle1">
-            {selectedTask.completedTime}
-          </Typography>
-        </Box>
-        <Divider />
-        <Box sx={boxStyle}>
-          <Typography variant="subtitle1" sx={titleStye}>
-            Turn Arround Time:
-          </Typography>
-          <Typography variant="subtitle1">
-            {selectedTask.turnArroundTime}
-          </Typography>
-        </Box>
-        <Divider />
-        <Box sx={boxStyle}>
           <Typography
             variant="subtitle1"
-            sx={{ ...titleStye, marginRight: "10px" }}
+            sx={{ ...customValueStyle, marginLeft: "17px" }}
           >
-            Url:
+            {selectedTask.name}
           </Typography>
-          <Typography variant="subtitle1">
+        </Box>
+        <Box sx={{ ...customBoxStyle }}>
+          <Typography variant="subtitle1" sx={{ ...customTitleStyle }}>
+            URL:
+          </Typography>
+          <Box
+            sx={{
+              ...customBoxStyle,
+              marginLeft: "48px",
+              wordBreak: "break-all",
+            }}
+          >
             <Link
               sx={{ textDecoration: "none" }}
               href={selectedTask.url}
@@ -196,9 +106,150 @@ const Task = ({ open, closeDrawer, selectedTask }) => {
             >
               {selectedTask.url}
             </Link>
+          </Box>
+        </Box>
+        <Box sx={{ ...customBoxStyle }}>
+          <Typography variant="subtitle1" sx={{ ...customTitleStyle }}>
+            Gid:
+          </Typography>
+          <Typography variant="subtitle1" sx={{ ...customValueStyle }}>
+            {selectedTask.gid}
           </Typography>
         </Box>
-        <Divider />
+        <Box sx={{ ...customBoxStyle }}>
+          <Typography variant="subtitle1" sx={{ ...customTitleStyle }}>
+            Created At:
+          </Typography>
+          <Typography variant="subtitle1" sx={{ ...customValueStyle }}>
+            {convertTime(selectedTask.createdAt)}
+          </Typography>
+        </Box>
+        <Box sx={{ ...customBoxStyle }}>
+          <Typography variant="subtitle1" sx={{ ...customTitleStyle }}>
+            Author:
+          </Typography>
+          <Typography variant="subtitle1" sx={{ ...customValueStyle }}>
+            {selectedTask.author}
+          </Typography>
+        </Box>
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          <Typography variant="subtitle1" sx={{ ...customTitleStyle }}>
+            Author Call Status:
+          </Typography>
+          <Box sx={{ marginLeft: "165px" }}>
+            <Box sx={{ ...customBoxStyle }}>
+              <Typography sx={{ ...customValueStyle }} variant="subtitle1">
+                Call Status:
+              </Typography>
+              <Typography sx={{ ...customValueStyle, marginLeft: "5px" }}>
+                {selectedTask.authorCallStatus.callStatus}
+              </Typography>
+            </Box>
+            <Box sx={{ ...customBoxStyle }}>
+              <Typography sx={{ ...customValueStyle }} variant="subtitle1">
+                Time:
+              </Typography>
+              <Typography sx={{ ...customValueStyle, marginLeft: "5px" }}>
+                {selectedTask.authorCallStatus.timeStamp}
+              </Typography>
+            </Box>
+            <Box sx={{ ...customBoxStyle }}>
+              <Typography sx={{ ...customValueStyle }} variant="subtitle1">
+                Number:
+              </Typography>
+              <Typography sx={{ ...customValueStyle, marginLeft: "5px" }}>
+                {selectedTask.authorCallStatus.number}
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+        <Box sx={{ ...customBoxStyle }}>
+          <Typography variant="subtitle1" sx={{ ...customTitleStyle }}>
+            Inprogress Time:
+          </Typography>
+          <Typography variant="subtitle1" sx={{ ...customValueStyle }}>
+            {selectedTask.inProgressTime}
+          </Typography>
+        </Box>
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          <Typography variant="subtitle1" sx={{ ...customTitleStyle }}>
+            Escalation Process:
+          </Typography>
+          <Box sx={{ marginLeft: "165px" }}>
+            {selectedTask.escalationProcess.map((item, index) => {
+              const statusColor = statusColors[item.callStatus] || "inherit";
+              return (
+                <Box
+                  key={index}
+                  sx={{
+                    marginBottom: "7px",
+                    backgroundColor: "#FFFFFF",
+                    borderRadius: "4px",
+                    padding: "10px",
+                    minWidth: "250px",
+                    width: "fit-content",
+                  }}
+                >
+                  <Box sx={{ ...customBoxStyle }}>
+                    <Typography
+                      sx={{ ...customValueStyle }}
+                      variant="subtitle1"
+                    >
+                      {callPriority[index]}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        ...customBoxStyle,
+                        marginLeft: "5px",
+                        color: statusColor,
+                      }}
+                    >
+                      {item.callStatus}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ ...customBoxStyle }}>
+                    <Typography
+                      sx={{ ...customValueStyle }}
+                      variant="subtitle1"
+                    >
+                      Time:
+                    </Typography>
+                    <Typography sx={{ ...customBoxStyle, marginLeft: "5px" }}>
+                      {item.timeStamp}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ ...customBoxStyle }}>
+                    <Typography
+                      sx={{ ...customValueStyle }}
+                      variant="subtitle1"
+                    >
+                      Number:
+                    </Typography>
+                    <Typography sx={{ ...customBoxStyle, marginLeft: "5px" }}>
+                      {item.number}
+                    </Typography>
+                  </Box>
+                </Box>
+              );
+            })}
+          </Box>
+        </Box>
+        <Box sx={{ ...customBoxStyle }}>
+          <Typography variant="subtitle1" sx={{ ...customTitleStyle }}>
+            Completed Time:
+          </Typography>
+          <Typography variant="subtitle1" sx={{ ...customValueStyle }}>
+            {selectedTask.completedTime}
+          </Typography>
+        </Box>
+        <Box sx={{ ...customBoxStyle }}>
+          <Typography variant="subtitle1" sx={{ ...customTitleStyle }}>
+            Turn Around Time:
+          </Typography>
+          <Typography variant="subtitle1" sx={{ ...customBoxStyle }}>
+            {selectedTask.turnArroundTime}
+          </Typography>
+        </Box>
       </Box>
     </Drawer>
   );

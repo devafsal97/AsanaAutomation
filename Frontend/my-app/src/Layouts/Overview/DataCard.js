@@ -22,13 +22,13 @@ const DataCard = ({ title, value }) => {
 
   console.log(title, value);
   let imageSrc;
-  if (title === "Active Task") {
+  if (title === "Active Tasks") {
     imageSrc = ActiveIcon;
-  } else if (title === "Average TurnArround Time") {
+  } else if (title === "Average Turn Around Time(minutes)") {
     imageSrc = AverageIcon;
-  } else if (title === "Completed Task Count") {
+  } else if (title === "Completed Task") {
     imageSrc = CompletedIcon;
-  } else if (title === "New Task") {
+  } else if (title === "New Tasks") {
     imageSrc = NewTaskIcon;
   }
   return (
